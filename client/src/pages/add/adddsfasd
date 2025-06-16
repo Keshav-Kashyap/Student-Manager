@@ -1,0 +1,26 @@
+// import React from 'react';
+// import { Header, StudentForm } from '../components/AddStudent/';
+
+// const AddStudent = () => {
+//   return (
+//     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-6">
+//       <div className="max-w-4xl mx-auto">
+//         <Header 
+//           title="Add New Student"
+//           subtitle="Enter student information to create a new record"
+//         />
+        
+//         <StudentForm />
+
+//         {/* Footer Note */}
+//         <div className="mt-6 text-center">
+//           <p className="text-sm text-gray-500">
+//             Fields marked with <span className="text-red-500">*</span> are required
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default AddStudent;
