@@ -1,13 +1,13 @@
 // pages/StudentIDPrintPage.jsx
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, Printer, FileText, BarChart3 } from 'lucide-react';
-import LoadingSpinner from '../components/studentList/ui/LoadingSpinner';
-import ErrorMessage from '../components/studentList/ui/ErrorMessage';
-import useStudents from '../hooks/useStudent';
-import PrintHeader from '../components/studentId/PrintHeader';
-import StudentSelector from '../components/studentId/StudentSelector';
-import IDCardGrid from '../components/studentId/IDCardGrid';
-import PrintStyles from '../components/studentId/PrintStyles';
+import LoadingSpinner from '../components/StudentList/ui/LoadingSpinner';
+import ErrorMessage from '../components/StudentList/ui/ErrorMessage';
+import useStudents from '../Hooks/useStudent';
+import PrintHeader from '../components/StudentId/PrintHeader';
+import StudentSelector from '../components/StudentId/StudentSelector';
+import IDCardGrid from '../components/StudentId/IDCardGrid';
+import PrintStyles from '../components/StudentId/PrintStyles';
 import toast from 'react-hot-toast';
 import { handleDeleteStudent } from '../handlers/studentHandlers';
 

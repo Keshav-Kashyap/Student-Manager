@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import Header from '../components/studentList/layouts/Header';
+import Header from '../components/StudentList/Layouts/header';
 import StudentSearch from '../components/StudentList/Student/StudentSearch';
 import StudentTable from '../components/StudentList/Student/StudentTable';
-import LoadingSpinner from '../components/studentList/ui/LoadingSpinner';
-import ErrorMessage from '../components/studentList/ui/ErrorMessage';
+import LoadingSpinner from '../components/StudentList/ui/LoadingSpinner';
+import ErrorMessage from '../components/StudentList/ui/ErrorMessage';
 import useStudents from '../hooks/useStudent';
 
 import { useNavigate } from 'react-router-dom';
