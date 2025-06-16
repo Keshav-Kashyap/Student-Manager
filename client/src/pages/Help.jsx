@@ -11,8 +11,6 @@ import {
 } from 'lucide-react';
 
 import PublicNavbar from '../components/common/PublicNavbar';
-import SearchBox from '../components/help/SearchBox';
-import CategoryCard from '../components/help/CategoryCard';
 import FAQSection from '../components/help/FAQSection';
 import ContactOption from '../components/help/ContactOption';
 
