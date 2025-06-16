@@ -8,7 +8,7 @@ import ProfileCompletionAlert from '../components/dashboard/ProfileCompletionAle
 import UserProfileCard from '../components/dashboard/UserProfileCard';
 
 // Hooks
-import useStudents from '../hooks/useStudent';
+import useStudents from '../Hooks/useStudent';
 
 // Print Statistics Service
 const PrintStatsService = {
