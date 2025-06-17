@@ -29,12 +29,14 @@ console.log('🔍 Full login response:', response);
       toast.success('Login successful!');
      
       // Save token and user data from response
-      if (response.token) {
-        localStorage.setItem('token', response.token);
-      }
-      if (response.user) {
-        localStorage.setItem('user', JSON.stringify(response.user));
-      }
+     const { token, user } = response.data;
+
+if (token) {
+  localStorage.setItem('token', token);
+}
+if (user) {
+  localStorage.setItem('user', JSON.stringify(user));
+}
       
       // If response structure is different, adjust accordingly
       // For example, if the entire response is user data:

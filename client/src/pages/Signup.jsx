@@ -49,9 +49,11 @@ const Signup = () => {
       console.log('Registration successful:', response);
       
       // Save token if returned from backend
-      if (response.token) {
-        localStorage.setItem('token', response.token);
-      }
+    const resData = response.data;
+
+if (resData.token) {
+  localStorage.setItem('token', resData.token);
+}
       
       // Save comprehensive user data from response for create-profile page
       const userData = {
