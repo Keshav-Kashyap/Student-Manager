@@ -1,7 +1,7 @@
 // src/utils/auth.js
 export const logoutUser = async (navigate) => {
   try {
-    await fetch("https://student-management-34a5.onrender.com/api/logout", {
+    await fetch("https://student-manager-qpdt.onrender.com/api/logout", {
       method: "POST",
       credentials: "include", // Include cookies if used
     });

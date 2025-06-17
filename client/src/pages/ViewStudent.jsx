@@ -24,7 +24,7 @@ const ViewStudentIDCardPage = () => {
     const fetchStudent = async () => {
       try {
         const response = await fetch(
-          `https://student-management-34a5.onrender.com/api/students/${id}`,
+          `https://student-manager-qpdt.onrender.com/api/students/${id}`,
           {
             method: 'GET',
             headers: getHeaders(),
@@ -65,7 +65,7 @@ const ViewStudentIDCardPage = () => {
     
     try {
       // Direct API call without using handler
-      const response = await fetch(`https://student-management-34a5.onrender.com/api/students/${student._id}`, {
+      const response = await fetch(`https://student-manager-qpdt.onrender.com/api/students/${student._id}`, {
         method: 'DELETE',
         headers: getHeaders(),
       });

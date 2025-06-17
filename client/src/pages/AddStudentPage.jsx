@@ -168,7 +168,7 @@ if (!formData.dateOfBirth.trim()) {
     }
 
     try {
-      const response = await fetch("https://student-management-34a5.onrender.com/api/students", {
+      const response = await fetch("https://student-manager-qpdt.onrender.com/api/students", {
         method: "POST",
         headers: getHeaders(true), // ✅ include auth headers
         body: submitData,

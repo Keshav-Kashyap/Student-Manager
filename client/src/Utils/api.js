@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://student-management-34a5.onrender.com/api';
+const API_BASE_URL = 'https://student-manager-qpdt.onrender.com/api';
 
 // Validation function for student form data
 export const validateFormData = (formData) => {

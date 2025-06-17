@@ -1,7 +1,7 @@
 // src/api/index.js
 import axios from 'axios';
 
-const API_URL = 'https://student-management-34a5.onrender.com/api';
+const API_URL = 'https://student-manager-qpdt.onrender.com/api';
 
 // Create axios instance
 const api = axios.create({

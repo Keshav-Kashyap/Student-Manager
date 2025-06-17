@@ -42,7 +42,7 @@ const EditStudentPage = () => {
 const fetchStudentData = async () => {
   try {
     const response = await fetch(
-      `https://student-management-34a5.onrender.com/api/students/${id}`,
+      `https://student-manager-qpdt.onrender.com/api/students/${id}`,
       {
         method: 'GET',
         headers: getHeaders(), // ✅ Pass JWT + x-user-id here
@@ -70,7 +70,7 @@ const fetchStudentData = async () => {
       if (result.photoPath) {
         const imageUrl = result.photoPath.startsWith('http')
   ? result.photoPath
-  : `https://student-management-34a5.onrender.com${result.photoPath}`;
+  : `https://student-manager-qpdt.onrender.com${result.photoPath}`;
 
         setExistingPhotoUrl(imageUrl);
         setPhotoPreview(imageUrl);
@@ -158,7 +158,7 @@ const fetchStudentData = async () => {
     }
 
     try {
-      const response = await fetch(`https://student-management-34a5.onrender.com/api/students/${id}`, {
+      const response = await fetch(`https://student-manager-qpdt.onrender.com/api/students/${id}`, {
   method: "PUT",
   headers: getHeaders(true), // ✅ Pass headers (true = FormData, so no content-type)
   body: submitData,
