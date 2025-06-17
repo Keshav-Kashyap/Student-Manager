@@ -24,7 +24,7 @@ const Login = () => {
     try {
       // API call - response object will contain user data and token
       const response = await authAPI.login(formData.email, formData.password);
-
+console.log('🔍 Full login response:', response);
       // Show success message
       toast.success('Login successful!');
      
