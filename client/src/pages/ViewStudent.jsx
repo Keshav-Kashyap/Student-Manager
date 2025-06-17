@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import IDCard from '../components/StudentId/IDCard';
 import LoadingSpinner from '../components/StudentList/ui/LoadingSpinner';
 import ErrorMessage from '../components/StudentList/ui/ErrorMessage';
-import { getHeaders } from '../services/StudentService';
+import { getHeaders } from '../services/studentService';
 import {
   handleEditStudent,
 } from '../handlers/studentHandlers';
