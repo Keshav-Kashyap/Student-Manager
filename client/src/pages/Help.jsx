@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 
 import PublicNavbar from '../components/common/PublicNavbar';
-import FAQSection from '../components/help/FAQSection';
-import ContactOption from '../components/help/ContactOption';
+import FAQSection from '../components/Help/FAQSection';
+import ContactOption from '../components/Help/ContactOption';
 
 // Main Help Center Component
 const HelpCenter = () => {

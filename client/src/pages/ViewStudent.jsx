@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import IDCard from '../components/StudentID/IDCard';
+import IDCard from '../components/StudentId/IDCard';
 import LoadingSpinner from '../components/studentList/ui/LoadingSpinner';
 import ErrorMessage from '../components/studentList/ui/ErrorMessage';
 import { getHeaders } from '../services/studentService';
 import {
   handleEditStudent,
-  handleDeleteStudent,
 } from '../handlers/studentHandlers';
 
-const ViewStudentIDCardPage = () => {
+const ViewStudentIDCardPage = () => {                                                                                                                    
   const { id } = useParams();
   const navigate = useNavigate();
   const [student, setStudent] = useState(null);
