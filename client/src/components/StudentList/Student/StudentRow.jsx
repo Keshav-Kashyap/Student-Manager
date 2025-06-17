@@ -1,7 +1,7 @@
 import React from 'react';
 import { User } from 'lucide-react';
 import StudentActions from './StudentActions';
-import { formatDate } from '../../../utils/dateUtils';
+import { formatDate } from '../../../Utils/dateUtils';
 
 const StudentRow = ({
   student,

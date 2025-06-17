@@ -1,7 +1,7 @@
 import React from "react";
 import { Edit, Info, HelpCircle, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { logoutUser } from "../../utils/auth"; // ✅ Import utility
+import { logoutUser } from "../../Utils/auth"; // ✅ Import utility
 
 const DropdownMenu = ({ isOpen, onClose, position = "desktop" }) => {
   const navigate = useNavigate();
