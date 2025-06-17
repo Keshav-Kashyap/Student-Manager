@@ -14,7 +14,7 @@ const app = express();
 
 // ✅ CORS setup — allow Netlify frontend
 const allowedOrigins = [
-  'https://surajprintingpressnew.netlify.app',
+  'https://student-manager-1-zi0k.onrender.com',
   'http://localhost:5173'
 ];
 app.use(cors({ origin: allowedOrigins, credentials: true }));
