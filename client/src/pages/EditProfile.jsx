@@ -6,7 +6,7 @@ import TabNavigation from '../components/EditProfile/TabNavigation';
 import PersonalInfoForm from '../components/EditProfile/PersonalInfoForm';
 import SecurityForm from '../components/EditProfile/SecurityForm';
 import SubmitButton from '../components/EditProfile/SubmitButton';
-import useProfile from '../hooks/useProfile';
+import useProfile from '../Hooks/useProfile';
 import toast from 'react-hot-toast';
 const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
   const navigate = useNavigate();
