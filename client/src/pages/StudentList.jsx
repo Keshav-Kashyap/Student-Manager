@@ -4,7 +4,7 @@ import StudentSearch from '../components/StudentList/Student/StudentSearch';
 import StudentTable from '../components/StudentList/Student/StudentTable';
 import LoadingSpinner from '../components/StudentList/ui/LoadingSpinner';
 import ErrorMessage from '../components/StudentList/ui/ErrorMessage';
-import useStudents from '../hooks/useStudent';
+import useStudents from '../Hooks/useStudent';
 
 import { useNavigate } from 'react-router-dom';
 import {
@@ -61,7 +61,7 @@ const StudentListPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      
+
         <Header onAddNewStudent={handleAddNewStudent} />
         <LoadingSpinner message="Loading students..." />
       </div>
@@ -71,7 +71,7 @@ const StudentListPage = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-       
+
         <Header onAddNewStudent={handleAddNewStudent} />
         <ErrorMessage error={error} onRetry={fetchStudents} />
       </div>
