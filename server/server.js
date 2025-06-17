@@ -18,7 +18,7 @@ const app = express();
 
 // Middleware
 const allowedOrigins = [
-  'https://surajprintingpress.netlify.app',
+  'https://surajprintingpressnew.netlify.app',
   'http://localhost:5173'
 ];
 
