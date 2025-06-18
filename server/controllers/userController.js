@@ -80,6 +80,7 @@ const loginUser = async (req, res) => {
     console.log(email);
     console.log(user);
     if (!user) {
+      console.log("User Not Found!!");
       return res.status(400).json({ 
         success: false,
         message: 'Invalid credentials' 
