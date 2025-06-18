@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
 import toast from 'react-hot-toast';
-
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
@@ -23,48 +22,31 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // ✅ API call - authAPI.login already returns response.data
+      // API call - response object will contain user data and token
       const response = await authAPI.login(formData.email, formData.password);
-      console.log('🔍 Full login response:', response);
-
+console.log('🔍 Full login response:', response);
       // Show success message
       toast.success('Login successful!');
-      
-      // ✅ Fixed: Direct destructure from response (not response.data)
-      // Backend returns: {success: true, token: '...', user: {...}}
-      const { token, user } = response;
+     
+      // Save token and user data from response
+     const { token, user } = response.data;
 
-      // ✅ Store with correct key names matching your API interceptor
-      if (token) {
-        localStorage.setItem('authtoken', token); // Same key as API uses
-        console.log('✅ Token stored as authtoken');
-      }
+if (token) {
+  localStorage.setItem('token', token);
+}
+if (user) {
+  localStorage.setItem('user', JSON.stringify(user));
+}
       
-      if (user) {
-        localStorage.setItem('user', JSON.stringify(user));
-        console.log('✅ User data stored:', user);
-      }
+      // If response structure is different, adjust accordingly
+      // For example, if the entire response is user data:
+      // localStorage.setItem('user', JSON.stringify(response));
 
-      // Verify storage
-      console.log('🔍 Stored token:', localStorage.getItem('authtoken'));
-      console.log('🔍 Stored user:', localStorage.getItem('user'));
-      
       // Navigate to dashboard
       navigate('/dashboard');
-      
     } catch (error) {
-      console.error('❌ Login error:', error);
-      
-      // Better error handling
-      let errorMessage = 'Login failed. Please try again.';
-      
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      toast.error(errorMessage);
+      console.error('Login error:', error);
+      toast.error(error.response?.data?.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -159,7 +141,6 @@ const Login = () => {
             >
               Sign Up
             </Link>
-          </Link>
           </p>
         </div>
       </div>
