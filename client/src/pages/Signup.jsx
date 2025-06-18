@@ -48,47 +48,62 @@ const Signup = () => {
       
       console.log('Registration successful:', response);
       
-      // Save token if returned from backend
-    const resData = response.data;
-
-if (resData.token) {
-  localStorage.setItem('token', resData.token);
-}
+      // Handle response data properly
+      const resData = response.data || response; // Some APIs return data directly
       
-      // Save comprehensive user data from response for create-profile page
+      // Save token if returned from backend
+      if (resData.token) {
+        localStorage.setItem('token', resData.token);
+      }
+      
+      // Create comprehensive user data object
       const userData = {
-        id: response.id || response._id, // Depending on your backend response
+        id: resData.id || resData._id || Date.now(), // Fallback ID if not provided
         name: formData.name,
         email: formData.email,
-        phone: response.phone || '',
-        collegeName: response.collegeName || '',
-        department: response.department || '',
-        designation: response.designation || '',
-        address: response.address || '',
-        emergencyContact: response.emergencyContact || '',
+        phone: resData.phone || '',
+        collegeName: resData.collegeName || '',
+        department: resData.department || '',
+        designation: resData.designation || '',
+        address: resData.address || '',
+        emergencyContact: resData.emergencyContact || '',
         isNewUser: true,
         isProfileComplete: false,
-        createdAt: response.createdAt || new Date().toISOString(),
-        // Add any other fields your backend might return
-        profileImage: response.profileImage || null
+        createdAt: resData.createdAt || new Date().toISOString(),
+        profileImage: resData.profileImage || null
       };
       
-      // Store complete user data
+      // Store user data in localStorage
       localStorage.setItem('user', JSON.stringify(userData));
       localStorage.setItem('isAuthenticated', 'true');
       
-      // Navigate to create profile with user data
+      console.log('User data saved:', userData);
+      
+      // Navigate to create-profile page with state
       navigate('/create-profile', {
         state: {
           userData: userData,
           isNewUser: true,
           fromSignup: true
-        }
+        },
+        replace: true // This prevents going back to signup
       });
       
     } catch (error) {
       console.error('Registration error:', error);
-      setError(error.response?.data?.message || 'Registration failed. Please try again.');
+      
+      // Better error handling
+      let errorMessage = 'Registration failed. Please try again.';
+      
+      if (error.response) {
+        // Server responded with error status
+        errorMessage = error.response.data?.message || error.response.data?.error || errorMessage;
+      } else if (error.message) {
+        // Network or other error
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
