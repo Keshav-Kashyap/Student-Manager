@@ -16,11 +16,7 @@
   const getUserId = () => {
     const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
     if (!userId) {
-      // Generate a temporary user ID for demo/development
-      const tempUserId = 'temp_user_' + Date.now();
-      localStorage.setItem('userId', tempUserId);
-      console.warn('No user ID found, created temporary ID:', tempUserId);
-      return tempUserId;
+      console.warn('No user ID found');
     }
     return userId;
   };

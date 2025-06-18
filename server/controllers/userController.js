@@ -124,7 +124,8 @@ const getCurrentUser = async (req, res) => {
   try {
     // req.user.id is set by authMiddleware
     const user = await User.findById(req.user.id).select('-password');
-    
+    console.log(req.user.id);
+    console.log(user);
     if (!user) {
       return res.status(404).json({
         success: false,
