@@ -16,7 +16,8 @@ const app = express();
 const allowedOrigins = [
   'https://student-manager-1-zi0k.onrender.com',
   'http://localhost:5173',
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'surajprintingpressnew.netlify.app'
 ];
 
 app.use(cors({
@@ -68,7 +69,7 @@ mongoose.connect(process.env.MONGODB_URI, {
   });
 
 // ✅ Health check route
-app.get('/', (req, res) => {
+app.get('/', (req, res) => {  
   res.json({
     message: 'Student Management Backend is live!',
     timestamp: new Date().toISOString(),

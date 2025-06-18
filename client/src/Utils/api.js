@@ -1,4 +1,6 @@
-const API_BASE_URL = 'https://student-manager-qpdt.onrender.com/api';
+const API_BASE = import.meta.env.DEV 
+  ? "http://localhost:5000" 
+  : "https://student-manager-qpdt.onrender.com";
 
 // Validation function for student form data
 export const validateFormData = (formData) => {

@@ -1,7 +1,8 @@
 // src/api/index.js
 import axios from 'axios';
+// Inside any file where API calls are made
+import { API_BASE } from '../config/api'; // ✅ adjust path as needed
 
-const API_URL = 'https://student-manager-qpdt.onrender.com/api';
 
 // Create axios instance
 const api = axios.create({

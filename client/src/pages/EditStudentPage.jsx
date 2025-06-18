@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getHeaders } from '../services/studentService';
+import { API_BASE } from '../config/api';
 import toast from 'react-hot-toast';
 import {
   HeaderSection,
@@ -41,8 +42,9 @@ const EditStudentPage = () => {
 
 const fetchStudentData = async () => {
   try {
+    console.log(id);
     const response = await fetch(
-      `https://student-manager-qpdt.onrender.com/api/students/${id}`,
+     `${API_BASE}/api/students/${id}`,
       {
         method: 'GET',
         headers: getHeaders(), // ✅ Pass JWT + x-user-id here
@@ -70,7 +72,7 @@ const fetchStudentData = async () => {
       if (result.photoPath) {
         const imageUrl = result.photoPath.startsWith('http')
   ? result.photoPath
-  : `https://student-manager-qpdt.onrender.com${result.photoPath}`;
+  : `${API_BASE}/${result.photoPath}`;
 
         setExistingPhotoUrl(imageUrl);
         setPhotoPreview(imageUrl);
@@ -158,7 +160,7 @@ const fetchStudentData = async () => {
     }
 
     try {
-      const response = await fetch(`https://student-manager-qpdt.onrender.com/api/students/${id}`, {
+      const response = await fetch(`${API_BASE}/api/students/${id}`, {
   method: "PUT",
   headers: getHeaders(true), // ✅ Pass headers (true = FormData, so no content-type)
   body: submitData,

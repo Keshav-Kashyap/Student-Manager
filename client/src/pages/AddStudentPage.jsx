@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { getHeaders } from '../services/studentService';
 import toast from 'react-hot-toast';
+import { API_BASE } from '../config/api';
 import {
   HeaderSection,
   PhotoUploadSection,
@@ -168,7 +169,8 @@ if (!formData.dateOfBirth.trim()) {
     }
 
     try {
-      const response = await fetch("https://student-manager-qpdt.onrender.com/api/students", {
+    const response = await fetch(`${API_BASE}/api/students`, {
+
         method: "POST",
         headers: getHeaders(true), // ✅ include auth headers
         body: submitData,

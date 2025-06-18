@@ -4,6 +4,7 @@ import IDCard from '../components/StudentId/IDCard';
 import LoadingSpinner from '../components/StudentList/ui/LoadingSpinner';
 import ErrorMessage from '../components/StudentList/ui/ErrorMessage';
 import { getHeaders } from '../services/studentService';
+import { API_BASE } from '../config/api';
 import {
   handleEditStudent,
 } from '../handlers/studentHandlers';
@@ -24,7 +25,8 @@ const ViewStudentIDCardPage = () => {
     const fetchStudent = async () => {
       try {
         const response = await fetch(
-          `https://student-manager-qpdt.onrender.com/api/students/${id}`,
+         `${API_BASE}/api/students/${id}`
+,
           {
             method: 'GET',
             headers: getHeaders(),
@@ -65,7 +67,8 @@ const ViewStudentIDCardPage = () => {
     
     try {
       // Direct API call without using handler
-      const response = await fetch(`https://student-manager-qpdt.onrender.com/api/students/${student._id}`, {
+      const response = await fetch(`${API_BASE}/api/students/${student._id}`
+, {
         method: 'DELETE',
         headers: getHeaders(),
       });
