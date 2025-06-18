@@ -50,7 +50,9 @@ const registerUser = async (req, res) => {
         email: user.email,
         role: user.role,
       }
+     
     });
+     console.log(user);
   } catch (err) {
     console.error('Registration error:', err);
     res.status(500).json({ 
@@ -75,6 +77,8 @@ const loginUser = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
+    console.log(email);
+    console.log(user);
     if (!user) {
       return res.status(400).json({ 
         success: false,
