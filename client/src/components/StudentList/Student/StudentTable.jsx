@@ -2,7 +2,9 @@ import React from 'react';
 import StudentRow from './StudentRow';
 import Pagination from '../common/Pagination';
 
-const StudentTable = ({
+const StudentTable = 
+
+({
     students,
     selectedStudents,
     onSelectAll,
@@ -12,6 +14,8 @@ const StudentTable = ({
     onDelete,
     totalStudents
 }) => {
+console.log("👨‍🎓 Students in StudentTable:", students);
+
     const isAllSelected = selectedStudents.length === students.length && students.length > 0;
 
     return (

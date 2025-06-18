@@ -47,19 +47,19 @@ const StudentRow = ({
         
       </td>
       <td className="px-6 py-4">
-        <div className="text-sm font-semibold text-gray-900">{student.name}</div>
-        <div className="text-xs text-gray-500">ID: {student._id}</div>
+        <div className="text-sm font-semibold text-gray-900">{student.name || 'N/A'}</div>
+        <div className="text-xs text-gray-500">ID: {student._id || 'N/A'}</div>
       </td>
-      <td className="px-6 py-4 text-sm text-gray-700">{student.fatherName}</td>
-      <td className="px-6 py-4 text-sm text-gray-700">{student.motherName}</td>
+      <td className="px-6 py-4 text-sm text-gray-700">{student.fatherName || 'N/A'}</td>
+      <td className="px-6 py-4 text-sm text-gray-700">{student.motherName || 'N/A'}</td>
       <td className="px-6 py-4">
         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-          Class {student.class}
+          Class {student.class || 'N/A'}
         </span>
       </td>
-      <td className="px-6 py-4 text-sm text-gray-700">{formatDate(student.dateOfBirth)}</td>
-      <td className="px-6 py-4 text-sm text-gray-700">{student.phone}</td>
-      <td className="px-6 py-4 text-sm text-gray-700 max-w-xs truncate">{student.address}</td>
+      <td className="px-6 py-4 text-sm text-gray-700">{formatDate(student.dateOfBirth || 'N/A')}</td>
+      <td className="px-6 py-4 text-sm text-gray-700">{student.phone || 'N/A'}</td>
+      <td className="px-6 py-4 text-sm text-gray-700 max-w-xs truncate">{student.address || 'N/A'}</td>
       <td className="px-6 py-4">
         <StudentActions
           studentId={student._id}

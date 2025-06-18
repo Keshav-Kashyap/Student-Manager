@@ -11,6 +11,8 @@ const useStudents = () => {
       setLoading(true);
       setError(null);
       const data = await studentService.fetchStudents();
+      console.log("📦 Data from backend:", data); // <- log this
+
       setStudents(data);
     } catch (err) {
       setError(err.message);
