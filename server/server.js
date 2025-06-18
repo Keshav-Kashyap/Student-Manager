@@ -22,7 +22,6 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 // ✅ Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ✅ Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
