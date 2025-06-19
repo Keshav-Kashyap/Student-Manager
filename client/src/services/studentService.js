@@ -1,5 +1,6 @@
   // API base configuration
-  const API_BASE = '/api/students';
+ import { API_BASE } from "../config/api";
+  const API_BASE2 = `${API_BASE}/api/students`;
 
   // Auth helper functions
   const getAuthToken = () => {
@@ -149,7 +150,7 @@
   export const fetchStudents = async () => {
     try {
       console.log('📡 Fetching students...');
-      const response = await fetch(`${API_BASE}`, {
+      const response = await fetch(`${API_BASE2}`, {
         method: 'GET',
         headers: getHeaders(),
       });
@@ -167,7 +168,7 @@
   export const deleteStudent = async (studentId) => {
     try {
       console.log('🗑️ Deleting student:', studentId);
-      const response = await fetch(`${API_BASE}/${studentId}`, {
+      const response = await fetch(`${API_BASE2}/${studentId}`, {
         method: 'DELETE',
         headers: getHeaders(),
       });
@@ -185,7 +186,7 @@
   export const deleteMultipleStudents = async (studentIds) => {
     try {
       console.log('🗑️ Batch deleting students:', studentIds);
-      const response = await fetch(`${API_BASE}`, {
+      const response = await fetch(`${API_BASE2}`, {
         method: 'DELETE',
         headers: getHeaders(),
         body: JSON.stringify({ studentIds }),
@@ -204,7 +205,7 @@
   export const getStudentById = async (studentId) => {
     try {
       console.log('👤 Fetching student by ID:', studentId);
-      const response = await fetch(`${API_BASE}/${studentId}`, {
+      const response = await fetch(`${API_BASE2}/${studentId}`, {
         method: 'GET',
         headers: getHeaders(),
       });
@@ -248,7 +249,7 @@
         isFormData = false;
       }
       
-      const response = await fetch(API_BASE, {
+      const response = await fetch(API_BASE2, {
         method: 'POST',
         headers: getHeaders(isFormData),
         body: body,
@@ -293,7 +294,7 @@
         isFormData = false;
       }
       
-      const response = await fetch(`${API_BASE}/${studentId}`, {
+      const response = await fetch(`${API_BASE2}/${studentId}`, {
         method: 'PUT',
         headers: getHeaders(isFormData),
         body: body,
@@ -316,7 +317,7 @@
         search: searchQuery,
       });
       
-      const response = await fetch(`${API_BASE}/search?${queryParams}`, {
+      const response = await fetch(`${API_BASE2}/search?${queryParams}`, {
         method: 'GET',
         headers: getHeaders(),
       });
@@ -334,7 +335,7 @@
   export const getStudentStats = async () => {
     try {
       console.log('📊 Fetching student stats...');
-      const response = await fetch(`${API_BASE}/stats`, {
+      const response = await fetch(`${API_BASE2}/stats`, {
         method: 'GET',
         headers: getHeaders(),
       });

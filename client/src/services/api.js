@@ -6,7 +6,7 @@ import { API_BASE } from '../config/api'; // ✅ adjust path as needed
 
 // Create axios instance
 const api = axios.create({
-  baseURL: API_BASE,
+  baseURL: `${API_BASE}/api`,
   timeout: 10000, // 10 second timeout
   headers: {
     'Content-Type': 'application/json',
