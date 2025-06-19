@@ -1,8 +1,18 @@
 // src/handlers/studentHandlers.js
 import toast from 'react-hot-toast';
+import { API_BASE } from '../config/api';
 
-// Custom Confirm Dialog Helper Function
+// Custom Confirm Dialog Helper Function - Production Safe Version
 const showConfirmDialog = (message, onConfirm, onCancel = () => {}) => {
+  // Check if we're in browser environment
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    // Fallback for SSR or non-browser environments
+    const confirmed = confirm(message);
+    if (confirmed) onConfirm();
+    else onCancel();
+    return;
+  }
+
   // Create modal backdrop
   const backdrop = document.createElement('div');
   backdrop.style.cssText = `
@@ -31,21 +41,25 @@ const showConfirmDialog = (message, onConfirm, onCancel = () => {}) => {
     animation: slideIn 0.2s ease-out;
   `;
 
-  // Add animation keyframes
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: scale(0.95) translateY(-10px);
+  // Add animation keyframes - Check if style already exists
+  let existingStyle = document.getElementById('confirm-dialog-styles');
+  if (!existingStyle) {
+    const style = document.createElement('style');
+    style.id = 'confirm-dialog-styles';
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95) translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
       }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-  `;
-  document.head.appendChild(style);
+    `;
+    document.head.appendChild(style);
+  }
 
   // Dialog content
   dialog.innerHTML = `
@@ -88,46 +102,68 @@ const showConfirmDialog = (message, onConfirm, onCancel = () => {}) => {
   `;
 
   backdrop.appendChild(dialog);
-  document.body.appendChild(backdrop);
+  
+  // Safely append to body
+  try {
+    document.body.appendChild(backdrop);
+  } catch (error) {
+    console.error('Error creating dialog:', error);
+    // Fallback to native confirm
+    const confirmed = confirm(message);
+    if (confirmed) onConfirm();
+    else onCancel();
+    return;
+  }
 
   // Button hover effects
   const cancelBtn = dialog.querySelector('#cancelBtn');
   const confirmBtn = dialog.querySelector('#confirmBtn');
 
-  cancelBtn.addEventListener('mouseenter', () => {
-    cancelBtn.style.backgroundColor = '#F3F4F6';
-    cancelBtn.style.borderColor = '#9CA3AF';
-  });
-  
-  cancelBtn.addEventListener('mouseleave', () => {
-    cancelBtn.style.backgroundColor = 'white';
-    cancelBtn.style.borderColor = '#D1D5DB';
-  });
+  if (cancelBtn && confirmBtn) {
+    cancelBtn.addEventListener('mouseenter', () => {
+      cancelBtn.style.backgroundColor = '#F3F4F6';
+      cancelBtn.style.borderColor = '#9CA3AF';
+    });
+    
+    cancelBtn.addEventListener('mouseleave', () => {
+      cancelBtn.style.backgroundColor = 'white';
+      cancelBtn.style.borderColor = '#D1D5DB';
+    });
 
-  confirmBtn.addEventListener('mouseenter', () => {
-    confirmBtn.style.backgroundColor = '#B91C1C';
-  });
-  
-  confirmBtn.addEventListener('mouseleave', () => {
-    confirmBtn.style.backgroundColor = '#DC2626';
-  });
+    confirmBtn.addEventListener('mouseenter', () => {
+      confirmBtn.style.backgroundColor = '#B91C1C';
+    });
+    
+    confirmBtn.addEventListener('mouseleave', () => {
+      confirmBtn.style.backgroundColor = '#DC2626';
+    });
+  }
 
   // Close dialog function
   const closeDialog = () => {
-    document.body.removeChild(backdrop);
-    document.head.removeChild(style);
+    try {
+      if (backdrop && backdrop.parentNode) {
+        document.body.removeChild(backdrop);
+      }
+    } catch (error) {
+      console.error('Error removing dialog:', error);
+    }
   };
 
   // Event listeners
-  cancelBtn.addEventListener('click', () => {
-    closeDialog();
-    onCancel();
-  });
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      closeDialog();
+      onCancel();
+    });
+  }
 
-  confirmBtn.addEventListener('click', () => {
-    closeDialog();
-    onConfirm();
-  });
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', () => {
+      closeDialog();
+      onConfirm();
+    });
+  }
 
   // Close on backdrop click
   backdrop.addEventListener('click', (e) => {
@@ -149,43 +185,78 @@ const showConfirmDialog = (message, onConfirm, onCancel = () => {}) => {
 };
 
 export const handleViewStudent = (navigate, studentId) => {
+  if (!studentId) {
+    console.error('Student ID is required');
+    toast.error('Invalid student ID');
+    return;
+  }
+  
   console.log('Navigating to view student:', studentId);
   navigate(`/app/student/view/${studentId}`);
 };
 
 export const handleEditStudent = (navigate, studentId) => {
+  if (!studentId) {
+    console.error('Student ID is required');
+    toast.error('Invalid student ID');
+    return;
+  }
+  
   console.log('Navigating to edit student:', studentId);
-  navigate(`/app/edit_student/${studentId}`);
+  // Use consistent route pattern
+  navigate(`/app/students/edit/${studentId}`);
 };
 
 export const handleDeleteStudent = async (studentId, deleteStudentFunc, setSelectedStudents) => {
+  if (!studentId) {
+    toast.error('Invalid student ID');
+    return;
+  }
+
   showConfirmDialog(
     'Are you sure you want to delete this student? This action cannot be undone.',
     async () => {
-      const result = await deleteStudentFunc(studentId);
-      if (result.success) {
-        setSelectedStudents(prev => prev.filter(id => id !== studentId));
-        toast.success('Student deleted successfully');
-      } else {
-        toast.error('Error deleting student: ' + result.error);
+      try {
+        const result = await deleteStudentFunc(studentId);
+        if (result.success) {
+          setSelectedStudents(prev => prev.filter(id => id !== studentId));
+          toast.success('Student deleted successfully');
+        } else {
+          toast.error('Error deleting student: ' + (result.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Delete student error:', error);
+        toast.error('Failed to delete student');
       }
     }
   );
 };
 
 export const handleDeleteSelected = async (selectedStudents, deleteMultipleStudentsFunc, setSelectedStudents) => {
-  if (selectedStudents.length === 0) return;
+  if (!selectedStudents || selectedStudents.length === 0) {
+    toast.error('No students selected');
+    return;
+  }
 
+  const count = selectedStudents.length;
   showConfirmDialog(
-    `Are you sure you want to delete ${selectedStudents.length} student${selectedStudents.length > 1 ? 's' : ''}? This action cannot be undone.`,
+    `Are you sure you want to delete ${count} student${count > 1 ? 's' : ''}? This action cannot be undone.`,
     async () => {
-      const result = await deleteMultipleStudentsFunc(selectedStudents);
-      if (result.success) {
-        setSelectedStudents([]);
-        toast.success('Students deleted successfully');
-      } else {
-        toast.error('Error deleting students: ' + result.error);
+      try {
+        const result = await deleteMultipleStudentsFunc(selectedStudents);
+        if (result.success) {
+          setSelectedStudents([]);
+          toast.success('Students deleted successfully');
+        } else {
+          toast.error('Error deleting students: ' + (result.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Delete multiple students error:', error);
+        toast.error('Failed to delete students');
       }
     }
   );
 };
+
+// Export the dialog function in case needed elsewhere
+export { showConfirmDialog };

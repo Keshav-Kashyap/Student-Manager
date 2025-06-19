@@ -26,17 +26,36 @@ const AuthenticatedLayout = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Safe localStorage access
+  const getSavedUser = () => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const savedUser = localStorage.getItem("user");
+        return savedUser ? JSON.parse(savedUser) : null;
+      }
+    } catch (error) {
+      console.error('Error accessing localStorage:', error);
+    }
+    return null;
+  };
+
   // Load user data from localStorage and redirect if no user
   useEffect(() => {
     const loadUserData = () => {
-      const savedUser = localStorage.getItem("user");
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
-      } else {
-        setUser(null);
+      try {
+        const savedUser = getSavedUser();
+        if (savedUser) {
+          setUser(savedUser);
+        } else {
+          setUser(null);
+          navigate("/login", { replace: true });
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
         navigate("/login", { replace: true });
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     loadUserData();
@@ -53,8 +72,11 @@ const AuthenticatedLayout = () => {
         closeSidebar();
       }
     };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    
+    if (typeof window !== 'undefined') {
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }
   }, []);
 
   if (loading) {
@@ -95,7 +117,18 @@ const AuthenticatedLayout = () => {
 
 // Helper component to check if user is logged in and route accordingly
 const ConditionalRoute = ({ component: Component, authPath }) => {
-  const isLoggedIn = localStorage.getItem("user");
+  const getSavedUser = () => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return localStorage.getItem("user");
+      }
+    } catch (error) {
+      console.error('Error accessing localStorage:', error);
+    }
+    return null;
+  };
+
+  const isLoggedIn = getSavedUser();
   
   if (isLoggedIn) {
     // User is logged in, redirect to authenticated version
@@ -137,10 +170,13 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="students" element={<StudentList />} />
           <Route path="students/add" element={<AddStudentPage />} />
+          
+          {/* Standardized edit route - use only one pattern */}
           <Route path="students/edit/:id" element={<EditStudentPage />} />
-          <Route path="edit_student/:id" element={<EditStudentPage />} />
-          <Route path="student/edit/:id" element={<EditStudentPage />} />
+          
+          {/* View student route */}
           <Route path="student/view/:id" element={<ViewStudentIDCardPage />} />
+          
           <Route path="print" element={<PrintIDCard />} />
           
           {/* Help and About pages - shows with layout for logged in users */}
@@ -150,13 +186,18 @@ function App() {
           <Route path="edit" element={<EditProfile />} />
         </Route>
 
-        {/* Redirect old routes */}
+        {/* Redirect old routes to new standardized routes */}
         <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
         <Route path="/students" element={<Navigate to="/app/students" replace />} />
         <Route path="/print" element={<Navigate to="/app/print" replace />} />
         <Route path="/add_new_student" element={<Navigate to="/app/students/add" replace />} />
         <Route path="/edit" element={<Navigate to="/app/edit" replace />} />
         <Route path="/app/create-profile" element={<Navigate to="/create-profile" replace />} />
+        
+        {/* Redirect old edit routes to new standardized route */}
+        <Route path="/edit_student/:id" element={<Navigate to="/app/students/edit/:id" replace />} />
+        <Route path="/app/edit_student/:id" element={<Navigate to="/app/students/edit/:id" replace />} />
+        <Route path="/app/student/edit/:id" element={<Navigate to="/app/students/edit/:id" replace />} />
 
         {/* 404 */}
         <Route path="*" element={<PageNotFound />} />
