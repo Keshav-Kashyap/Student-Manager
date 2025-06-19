@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, Outlet, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, Outlet, Navigate, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
@@ -20,46 +20,90 @@ import EditProfile from "./pages/EditProfile";
 import PageNotFound from "./pages/page404";
 import ViewStudentIDCardPage from "./pages/ViewStudent";
 
-const AuthenticatedLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+// Global Auth Hook
+const useAuth = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Safe localStorage access
-  const getSavedUser = () => {
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        const savedUser = localStorage.getItem("user");
-        return savedUser ? JSON.parse(savedUser) : null;
-      }
-    } catch (error) {
-      console.error('Error accessing localStorage:', error);
-    }
-    return null;
-  };
-
-  // Load user data from localStorage and redirect if no user
   useEffect(() => {
-    const loadUserData = () => {
+    const checkAuth = () => {
       try {
-        const savedUser = getSavedUser();
-        if (savedUser) {
-          setUser(savedUser);
-        } else {
-          setUser(null);
-          navigate("/login", { replace: true });
+        if (typeof window !== 'undefined' && window.localStorage) {
+          const savedUser = localStorage.getItem("user");
+          if (savedUser) {
+            const parsedUser = JSON.parse(savedUser);
+            setUser(parsedUser);
+            setIsAuthenticated(true);
+          } else {
+            setUser(null);
+            setIsAuthenticated(false);
+          }
         }
       } catch (error) {
-        console.error('Error loading user data:', error);
-        navigate("/login", { replace: true });
+        console.error('Auth check error:', error);
+        setUser(null);
+        setIsAuthenticated(false);
+        // Clear corrupted data
+        localStorage.removeItem("user");
       } finally {
         setLoading(false);
       }
     };
 
-    loadUserData();
-  }, [navigate]);
+    checkAuth();
+  }, []);
+
+  const login = (userData) => {
+    try {
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Login error:', error);
+    }
+  };
+
+  const logout = () => {
+    try {
+      localStorage.removeItem("user");
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  return { user, loading, isAuthenticated, login, logout, setUser };
+};
+
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen text-xl font-semibold">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          Loading...
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    // Redirect to login with the current location
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+};
+
+const AuthenticatedLayout = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user, setUser } = useAuth();
 
   // Sidebar togglers
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
@@ -78,14 +122,6 @@ const AuthenticatedLayout = () => {
       return () => window.removeEventListener("resize", handleResize);
     }
   }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen text-xl font-semibold">
-        Loading...
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -117,26 +153,42 @@ const AuthenticatedLayout = () => {
 
 // Helper component to check if user is logged in and route accordingly
 const ConditionalRoute = ({ component: Component, authPath }) => {
-  const getSavedUser = () => {
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        return localStorage.getItem("user");
-      }
-    } catch (error) {
-      console.error('Error accessing localStorage:', error);
-    }
-    return null;
-  };
+  const { isAuthenticated, loading } = useAuth();
 
-  const isLoggedIn = getSavedUser();
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen text-xl font-semibold">
+        Loading...
+      </div>
+    );
+  }
   
-  if (isLoggedIn) {
+  if (isAuthenticated) {
     // User is logged in, redirect to authenticated version
     return <Navigate to={authPath} replace />;
   }
   
   // User is not logged in, show full page component
   return <Component />;
+};
+
+// Public Route Component
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen text-xl font-semibold">
+        Loading...
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/app/dashboard" replace />;
+  }
+
+  return children;
 };
 
 function App() {
@@ -146,10 +198,24 @@ function App() {
       <ConfirmDialog/>
 
       <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        {/* Public routes - redirect to dashboard if already logged in */}
+        <Route path="/" element={
+          <PublicRoute>
+            <LandingPage />
+          </PublicRoute>
+        } />
+        
+        <Route path="/login" element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        } />
+        
+        <Route path="/signup" element={
+          <PublicRoute>
+            <Signup />
+          </PublicRoute>
+        } />
         
         {/* Conditional routes - full page if not logged in, redirect to app version if logged in */}
         <Route 
@@ -165,7 +231,11 @@ function App() {
         <Route path="/create-profile" element={<EditProfile />} />
 
         {/* Protected app routes */}
-        <Route path="/app" element={<AuthenticatedLayout />}>
+        <Route path="/app" element={
+          <ProtectedRoute>
+            <AuthenticatedLayout />
+          </ProtectedRoute>
+        }>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="students" element={<StudentList />} />
