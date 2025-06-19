@@ -8,7 +8,7 @@ const SidebarItem = ({ href, icon: Icon, name }) => {
   const isActive = location.pathname === `${basePath}${href}`;
 
   return (
-    <li>
+  
       <Link
         to={href}
         className={`
@@ -75,7 +75,7 @@ const SidebarItem = ({ href, icon: Icon, name }) => {
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 w-full transform translate-x-full group-hover:translate-x-[-200%] transition-transform duration-1000"></div>
         )}
       </Link>
-    </li>
+   
   );
 };
 
