@@ -14,7 +14,7 @@ const app = express();
 
 // ✅ CORS setup — allow all origins for development, restrict for production
 const allowedOrigins = [
-  'https://student-manager-1-zi0k.onrender.com',
+  'https://surajprinting.netlify.app',
   'http://localhost:5173',
   'http://localhost:3000',
   'https://student-manager-client.onrender.com'
