@@ -13,7 +13,7 @@ const Footer = () => {
             <div className="w-8 h-8 bg-gradient-to-br from-indigo-400 to-purple-600 rounded-lg flex items-center justify-center">
               <GraduationCap size={20} className="text-white" />
             </div>
-            <span className="text-white font-semibold select-none">EduManage</span>
+            <span className="text-white font-semibold select-none">Suraj Printing Press</span>
           </div>
 
           <div className="flex items-center gap-6 text-indigo-200">
@@ -24,7 +24,7 @@ const Footer = () => {
         </div>
 
         <div className="text-center mt-6 pt-6 border-t border-white/10">
-          <p className="text-indigo-200">&copy; 2025 EduManage. All rights reserved.</p>
+          <p className="text-indigo-200">&copy; 2025 Suraj Printing Press. All rights reserved.</p>
         </div>
       </div>
     </footer>
@@ -32,3 +32,5 @@ const Footer = () => {
 };
 
 export default Footer;
+
+
