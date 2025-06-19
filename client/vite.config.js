@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      '/api': 'http://localhost:5000', // 🧠 Backend URL yahan set kar
+      '/api': 'https://student-manager-backend-zbjw.onrender.com', // 🧠 Backend URL yahan set kar
     },
   },
 });
