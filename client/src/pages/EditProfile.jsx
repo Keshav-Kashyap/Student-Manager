@@ -11,7 +11,10 @@ import toast from 'react-hot-toast';
 const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+  const [showErrors, setShowErrors] = useState(false);
+  const [customFieldErrors, setCustomFieldErrors] = useState({});
+
+
   // Use the useProfile hook to get real-time profile data
   const { 
     profile, 
@@ -120,59 +123,66 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    try {
-      // ✅ Emergency contact validation
-      if (!/^\d{10}$/.test(formData.emergencyContact)) {
-        toast.error('Emergency contact must be a valid 10-digit number');
-        setIsLoading(false);
-        return;
-      }
-      
-      // Prepare data for API call
-      const profileData = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        emergencyContact: formData.emergencyContact,
-        collegeName: formData.collegeName,
-        department: formData.department,
-        designation: formData.designation,
-        profileImage: profileImage
-      };
+  e.preventDefault();
+  setIsLoading(true);
+  setShowErrors(true);
+  setCustomFieldErrors({}); // reset old errors
 
-      // If updating password
-      if (formData.newPassword && formData.newPassword.trim() !== '') {
-        if (formData.newPassword !== formData.confirmPassword) {
-          toast.error('New passwords do not match!');
-          setIsLoading(false);
-          return;
-        }
-        profileData.currentPassword = formData.currentPassword;
-        profileData.newPassword = formData.newPassword;
-      }
+  const requiredFields = ['name', 'email', 'phone', 'collegeName', 'address'];
+  const emptyFields = requiredFields.filter(field => !formData[field]?.trim());
 
-      // Use the appropriate method from useProfile hook
-      if (isCreateMode) {
-        await createProfile(profileData);
-        toast.success('Profile created successfully! Welcome aboard!');
-        navigate('/app/dashboard');
-      } else {
-        await updateProfile(profileData);
-        toast.success('Profile updated successfully!');
-        navigate('/app/dashboard');
-      }
-      
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error(error.message || 'Something went wrong. Please try again.');
-    } finally {
+  if (emptyFields.length > 0) {
+    toast.error('Please fill in all required fields');
+    setIsLoading(false);
+    return;
+  }
+
+  // ✅ Emergency contact custom validation
+  const newErrors = {};
+  if (formData.emergencyContact && !/^\d{10}$/.test(formData.emergencyContact)) {
+    newErrors.emergencyContact = 'Emergency contact must be a valid 10-digit number';
+  }
+
+  if (formData.phone && !/^\d{10}$/.test(formData.phone)) {
+    newErrors.phone = 'Phone number must be a valid 10-digit number';
+  }
+
+  if (Object.keys(newErrors).length > 0) {
+    setCustomFieldErrors(newErrors);
+    toast.error('Please fix the highlighted errors');
+    setIsLoading(false);
+    return;
+  }
+
+  try {
+    // build profileData
+    const profileData = {
+      ...formData,
+      profileImage
+    };
+
+    if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
+      toast.error('New passwords do not match!');
       setIsLoading(false);
+      return;
     }
-  };
+
+    if (isCreateMode) {
+      await createProfile(profileData);
+      toast.success('Profile created successfully! Welcome aboard!');
+    } else {
+      await updateProfile(profileData);
+      toast.success('Profile updated successfully!');
+    }
+
+    navigate('/app/dashboard');
+  } catch (error) {
+    toast.error(error.message || 'Something went wrong. Please try again.');
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleGoBack = () => {
     if (isCreateMode) {
@@ -193,6 +203,8 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
           formData={formData} 
           onChange={handleInputChange} 
           isCreateMode={isCreateMode} 
+           showErrors={showErrors}
+           fieldErrors={customFieldErrors}
         />
       );
     }
@@ -215,6 +227,8 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
         formData={formData} 
         onChange={handleInputChange} 
         isCreateMode={isCreateMode} 
+        showErrors={showErrors}
+          fieldErrors={customFieldErrors}
       />
     );
   };

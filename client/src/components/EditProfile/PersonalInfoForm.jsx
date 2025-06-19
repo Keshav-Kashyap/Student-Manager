@@ -2,43 +2,23 @@ import React, { useEffect } from 'react';
 import { User, Mail, Phone, MapPin, UserCheck, Building, Briefcase } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const PersonalInfoForm = ({ formData, onChange, isCreateMode }) => {
+const PersonalInfoForm = ({ formData, onChange, isCreateMode,showErrors ,fieldErrors = {}  }) => {
   // Helper function to check if field is empty and required
   const isFieldEmpty = (fieldName) => {
-    return isCreateMode && (!formData[fieldName] || formData[fieldName].trim() === '');
-  };
+  return isCreateMode && showErrors && (!formData[fieldName] || formData[fieldName].trim() === '');
+};
 
   // Check validation and show toast messages
-  useEffect(() => {
-    if (isCreateMode) {
-      const requiredFields = [
-        { name: 'name', label: 'Full Name' },
-        { name: 'email', label: 'Email Address' },
-        { name: 'phone', label: 'Phone Number' },
-        { name: 'collegeName', label: 'College/Institution Name' },
-        { name: 'address', label: 'Address' }
-      ];
+ 
 
-      const emptyFields = requiredFields.filter(field => isFieldEmpty(field.name));
-
-      if (emptyFields.length === 1) {
-        toast.error(`Please fill in your ${emptyFields[0].label}`);
-      } else if (emptyFields.length > 1) {
-        toast.error('Please fill in all highlighted required information');
-      }
-    }
-  }, [formData, isCreateMode]);
-
-  // Get input class based on validation state
-  const getInputClass = (fieldName, isRequired = false) => {
-    const baseClass = "w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200";
-    
-    if (isRequired && isFieldEmpty(fieldName)) {
-      return `${baseClass} border-red-500 focus:ring-red-500`;
-    }
-    
-    return `${baseClass} border-gray-300`;
-  };
+  // Get input class based on validation stateHis
+ const getInputClass = (fieldName, isRequired = false) => {
+  const baseClass = "w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200";
+  if (isRequired && isFieldEmpty(fieldName)) {
+    return `${baseClass} border-red-500 focus:ring-red-500`;
+  }
+  return `${baseClass} border-gray-300`;
+};
 
   // Get textarea class for address field
   const getTextareaClass = (fieldName) => {
@@ -113,9 +93,12 @@ const PersonalInfoForm = ({ formData, onChange, isCreateMode }) => {
             />
             <Phone className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
           </div>
-          {isFieldEmpty('phone') && (
-            <p className="text-red-500 text-sm mt-1">Phone number is required</p>
-          )}
+        {isFieldEmpty('phone') && (
+  <p className="text-red-500 text-sm mt-1">Phone number is required</p>
+)}
+{fieldErrors.phone && (
+  <p className="text-red-500 text-sm mt-1">{fieldErrors.phone}</p>
+)}
         </div>
 
         {/* College/Institution Name */}
