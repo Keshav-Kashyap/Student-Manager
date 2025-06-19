@@ -1,5 +1,6 @@
 // 📁 src/hooks/useUser.js
 import { useState, useEffect } from 'react';
+import { API_BASE } from '../config/api';
 
 const useUser = () => {
   const [user, setUser] = useState(null);
@@ -27,7 +28,7 @@ const useUser = () => {
     }
 
     try {
-      const res = await fetch('/api/profile/me', {
+      const res = await fetch(`${API_BASE}/api/profile/me`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Printer, BarChart3 } from 'lucide-react';
-
+import { API_BASE } from '../config/api';
 // Components
 import StatCard from '../components/StatCard';
 import UserWelcomeSection from '../components/dashboard/UserWelcomeSection';
@@ -136,7 +136,7 @@ const Dashboard = () => {
         return;
       }
 
-      const response = await fetch('/api/profile/me', {
+      const response = await fetch(`${API_BASE}/api/profile/me`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

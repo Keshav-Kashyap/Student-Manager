@@ -1,6 +1,6 @@
 // 📁 src/hooks/useProfile.js
 import { useState, useEffect } from 'react';
-
+import { API_BASE } from '../config/api';
 const useProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,7 +28,7 @@ const useProfile = () => {
 
     try {
       setLoading(true);
-      const res = await fetch('/api/profile/me', {
+      const res = await fetch(`${API_BASE}/api/profile/me`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -76,7 +76,7 @@ const useProfile = () => {
 
     try {
       setLoading(true);
-      const res = await fetch('/api/profile/create', {
+      const res = await fetch(`${API_BASE}/api/profile/create`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -113,7 +113,7 @@ const useProfile = () => {
 
     try {
       setLoading(true);
-      const res = await fetch('/api/profile/update', {
+      const res = await fetch(`${API_BASE}/api/profile/update`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
