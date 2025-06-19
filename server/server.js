@@ -17,7 +17,7 @@ const allowedOrigins = [
   'https://student-manager-1-zi0k.onrender.com',
   'http://localhost:5173',
   'http://localhost:3000',
-  'surajprintingpressnew.netlify.app'
+  'https://student-manager-client.onrender.com'
 ];
 
 app.use(cors({
