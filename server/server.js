@@ -8,7 +8,7 @@ const path = require('path');
 const userRoutes = require('./routes/userRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const profileRoutes = require('./routes/profileRoutes');
-
+const createAdmin = require('./routes/createAdminRoutes')
 dotenv.config();
 const app = express();
 
@@ -20,6 +20,8 @@ const allowedOrigins = [
   'https://student-manager-client.onrender.com'
 ];
 
+
+// app.use('/create-admin', createAdmin)
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)

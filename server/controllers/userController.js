@@ -124,6 +124,10 @@ const loginUser = async (req, res) => {
   }
 };
 
+
+
+
+
 // Get current logged-in user
 const getCurrentUser = async (req, res) => {
   try {
@@ -152,4 +156,18 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getCurrentUser };
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select('-password'); // Don't return passwords
+    res.json(users);
+  } catch (error) {
+    console.error('❌ Error getting all users:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+
+
+
+module.exports = { registerUser, loginUser, getCurrentUser,getAllUsers, };
