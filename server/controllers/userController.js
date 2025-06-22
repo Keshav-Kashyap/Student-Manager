@@ -162,7 +162,7 @@ const getAllUsers = async (req, res) => {
     const users = await User.find().select('-password'); // Don't return passwords
      const usersWithCounts = await Promise.all(
       users.map(async (user) => {
-        const studentCount = await Student.countDocuments({ userId: user._id });
+        const studentCount = await Student.countDocuments({ createdBy: user._id });
         return {
           id: user._id,
           name: user.name,
