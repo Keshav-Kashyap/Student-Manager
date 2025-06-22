@@ -1,6 +1,6 @@
 const Profile = require('../models/Profile');
 const User = require('../models/User');
-const Student = require('../models/Student');
+
 // Create Profile
 const createProfile = async (req, res) => {
   const { 
@@ -204,41 +204,23 @@ const updateProfile = async (req, res) => {
 const getAllUsersProfile = async (req, res) => {
   try {
     const profiles = await Profile.find()
-      .populate('userId', 'name email')
-      .lean();
+      .populate('userId', 'name email') // join User fields
+      .lean(); // optional: makes result faster (plain JS)
 
-    // Fetch all student counts mapped by userId
-    const counts = await Student.aggregate([
-      {
-        $group: {
-          _id: '$userId',
-          count: { $sum: 1 }
-        }
-      }
-    ]);
-
-    const studentCountMap = {};
-    counts.forEach(item => {
-      studentCountMap[item._id.toString()] = item.count;
-    });
-
-    const formatted = profiles.map((profile) => {
-      const uid = profile.userId?._id?.toString();
-      return {
-        id: uid || null,
-        name: profile.userId?.name || 'Unknown',
-        email: profile.userId?.email || 'Unknown',
-        collegeName: profile.collegeName || '',
-        department: profile.department || '',
-        designation: profile.designation || '',
-        address: profile.address || '',
-        emergencyContact: profile.emergencyContact || '',
-        phone: profile.phone || '',
-        profileImage: profile.profileImage || null,
-        profileId: profile._id,
-        studentsCount: studentCountMap[uid] || 0, // 🔥 here is the count
-      };
-    });
+    // Format response to merge userId fields into profile
+    const formatted = profiles.map((profile) => ({
+      id: profile.userId?._id || null,
+      name: profile.userId?.name || 'Unknown',
+      email: profile.userId?.email || 'Unknown',
+      collegeName: profile.collegeName || '',
+      department: profile.department || '',
+      designation: profile.designation || '',
+      address: profile.address || '',
+      emergencyContact: profile.emergencyContact || '',
+      phone: profile.phone || '',
+      profileImage: profile.profileImage || null,
+      profileId: profile._id,
+    }));
 
     res.status(200).json(formatted);
   } catch (error) {
@@ -246,7 +228,6 @@ const getAllUsersProfile = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
 
 
 
