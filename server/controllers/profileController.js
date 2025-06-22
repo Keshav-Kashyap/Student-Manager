@@ -204,7 +204,7 @@ const updateProfile = async (req, res) => {
 const getAllUsersProfile = async (req, res) => {
   try {
     const profiles = await Profile.find()
-      .populate('userId', 'name email') // join User fields
+      .populate('userId', 'name email createdAt role studentsCount') // join User fields
       .lean(); // optional: makes result faster (plain JS)
 
       const count =10
@@ -222,7 +222,7 @@ const getAllUsersProfile = async (req, res) => {
       phone: profile.phone || '',
       profileImage: profile.profileImage || null,
       profileId: profile._id,
-   studentsCount: count,
+   studentsCount: profile.userId?.studentsCount,
 
     joinDate: profile.userId?.createdAt 
       ? new Date(profile.userId.createdAt).toLocaleDateString('en-IN') 

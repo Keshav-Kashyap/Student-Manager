@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// JWT generator
+const Student = require('../models/Student');
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '1d' });
 };
@@ -160,7 +160,21 @@ const getCurrentUser = async (req, res) => {
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select('-password'); // Don't return passwords
-    res.json(users);
+     const usersWithCounts = await Promise.all(
+      users.map(async (user) => {
+        const studentCount = await Student.countDocuments({ userId: user._id });
+        return {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          createdAt: user.createdAt,
+          studentsCount: studentCount,
+        };
+      })
+    );
+
+    res.json(usersWithCounts);
   } catch (error) {
     console.error('❌ Error getting all users:', error);
     res.status(500).json({ message: 'Server error' });
