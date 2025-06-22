@@ -163,6 +163,7 @@ const getAllUsers = async (req, res) => {
      const usersWithCounts = await Promise.all(
       users.map(async (user) => {
         const studentCount = await Student.countDocuments({ createdBy: user._id });
+        console.log(`👤 User: ${user.name} (${user.email}) → Students: ${studentCount}`);
         return {
           id: user._id,
           name: user.name,
