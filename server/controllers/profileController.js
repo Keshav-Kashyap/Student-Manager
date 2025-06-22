@@ -220,6 +220,7 @@ const getAllUsersProfile = async (req, res) => {
       phone: profile.phone || '',
       profileImage: profile.profileImage || null,
       profileId: profile._id,
+     studentsCount:10,
     }));
 
     res.status(200).json(formatted);
