@@ -1,6 +1,5 @@
 const Profile = require('../models/Profile');
 const User = require('../models/User');
-const Student = require('../models/Student'); // Add this import
 
 // Create Profile
 const createProfile = async (req, res) => {
@@ -201,161 +200,40 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// Get All Users with Student Count and Student Information
+
 const getAllUsersProfile = async (req, res) => {
   try {
     const profiles = await Profile.find()
-      .populate('userId', 'name email')
-      .lean();
+      .populate('userId', 'name email') // join User fields
+      .lean(); // optional: makes result faster (plain JS)
 
-    // Get student data for all users
-    const userIds = profiles.map(profile => profile.userId?._id).filter(Boolean);
-    
-    // Get student counts for each user
-    const studentCounts = await Student.aggregate([
-      { $match: { createdBy: { $in: userIds } } },
-      { $group: { _id: '$createdBy', count: { $sum: 1 } } }
-    ]);
+    // Format response to merge userId fields into profile
+    const formatted = profiles.map((profile) => ({
+      id: profile.userId?._id || null,
+      name: profile.userId?.name || 'Unknown',
+      email: profile.userId?.email || 'Unknown',
+      collegeName: profile.collegeName || '',
+      department: profile.department || '',
+      designation: profile.designation || '',
+      address: profile.address || '',
+      emergencyContact: profile.emergencyContact || '',
+      phone: profile.phone || '',
+      profileImage: profile.profileImage || null,
+      profileId: profile._id,
+    }));
 
-    // Get recent students for each user (optional - you can modify this based on your needs)
-    const recentStudents = await Student.find({ createdBy: { $in: userIds } })
-      .populate('createdBy', 'name email')
-      .sort({ createdAt: -1 })
-      .limit(100) // Adjust limit as needed
-      .lean();
-
-    // Create a map for quick lookup
-    const studentCountMap = {};
-    studentCounts.forEach(item => {
-      studentCountMap[item._id.toString()] = item.count;
-    });
-
-    // Group students by user
-    const studentsByUser = {};
-    recentStudents.forEach(student => {
-      const userId = student.createdBy._id.toString();
-      if (!studentsByUser[userId]) {
-        studentsByUser[userId] = [];
-      }
-      studentsByUser[userId].push({
-        id: student._id,
-        name: student.name,
-        class: student.class,
-        phone: student.phone,
-        photoPath: student.photoPath,
-        createdAt: student.createdAt
-      });
-    });
-
-    // Format response with student data
-    const formatted = profiles.map((profile) => {
-      const userId = profile.userId?._id?.toString();
-      return {
-        id: profile.userId?._id || null,
-        name: profile.userId?.name || 'Unknown',
-        email: profile.userId?.email || 'Unknown',
-        collegeName: profile.collegeName || '',
-        department: profile.department || '',
-        designation: profile.designation || '',
-        address: profile.address || '',
-        emergencyContact: profile.emergencyContact || '',
-        phone: profile.phone || '',
-        profileImage: profile.profileImage || null,
-        profileId: profile._id,
-        // Student information
-        studentCount: studentCountMap[userId] || 0,
-        students: studentsByUser[userId] || [],
-        hasStudents: (studentCountMap[userId] || 0) > 0
-      };
-    });
-
-    // Add summary statistics
-    const totalUsers = formatted.length;
-    const totalStudents = Object.values(studentCountMap).reduce((sum, count) => sum + count, 0);
-    const usersWithStudents = formatted.filter(user => user.hasStudents).length;
-
-    res.status(200).json({
-      users: formatted,
-      summary: {
-        totalUsers,
-        totalStudents,
-        usersWithStudents,
-        usersWithoutStudents: totalUsers - usersWithStudents
-      },
-      success: true,
-      message: 'Users with student data retrieved successfully'
-    });
+    res.status(200).json(formatted);
   } catch (error) {
-    console.error('❌ Error getting all users with students:', error);
-    res.status(500).json({ 
-      message: 'Server error', 
-      error: error.message,
-      success: false 
-    });
+    console.error('❌ Error getting all users:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Get Single User's Students (Additional endpoint)
-const getUserStudents = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    
-    if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(400).json({ success: false, message: 'Invalid user ID format' });
-    }
 
-    // Get user profile
-    const profile = await Profile.findOne({ userId })
-      .populate('userId', 'name email');
-
-    if (!profile) {
-      return res.status(404).json({ success: false, message: 'User profile not found' });
-    }
-
-    // Get user's students
-    const students = await Student.find({ createdBy: userId })
-      .sort({ createdAt: -1 })
-      .lean();
-
-    // Get student statistics
-    const totalStudents = students.length;
-    const classStats = await Student.aggregate([
-      { $match: { createdBy: userId } },
-      { $group: { _id: '$class', count: { $sum: 1 } } },
-      { $sort: { _id: 1 } }
-    ]);
-
-    res.status(200).json({
-      success: true,
-      user: {
-        id: profile.userId._id,
-        name: profile.userId.name,
-        email: profile.userId.email,
-        collegeName: profile.collegeName,
-        department: profile.department,
-        designation: profile.designation
-      },
-      students: students,
-      statistics: {
-        totalStudents,
-        classStats
-      },
-      message: 'User students retrieved successfully'
-    });
-  } catch (error) {
-    console.error('❌ Error getting user students:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error fetching user students',
-      error: error.message 
-    });
-  }
-};
 
 module.exports = {
   createProfile,
   getProfile,
   updateProfile,
   getAllUsersProfile,
-  getUserStudents, // New endpoint
 };
