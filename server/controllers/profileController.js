@@ -200,8 +200,40 @@ const updateProfile = async (req, res) => {
   }
 };
 
+
+const getAllUsersProfile = async (req, res) => {
+  try {
+    const profiles = await Profile.find()
+      .populate('userId', 'name email') // join User fields
+      .lean(); // optional: makes result faster (plain JS)
+
+    // Format response to merge userId fields into profile
+    const formatted = profiles.map((profile) => ({
+      id: profile.userId?._id || null,
+      name: profile.userId?.name || 'Unknown',
+      email: profile.userId?.email || 'Unknown',
+      collegeName: profile.collegeName || '',
+      department: profile.department || '',
+      designation: profile.designation || '',
+      address: profile.address || '',
+      emergencyContact: profile.emergencyContact || '',
+      phone: profile.phone || '',
+      profileImage: profile.profileImage || null,
+      profileId: profile._id,
+    }));
+
+    res.status(200).json(formatted);
+  } catch (error) {
+    console.error('❌ Error getting all users:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+
 module.exports = {
   createProfile,
   getProfile,
-  updateProfile
+  updateProfile,
+  getAllUsersProfile,
 };
