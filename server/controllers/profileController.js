@@ -208,44 +208,37 @@ const getAllUsersProfile = async (req, res) => {
       .lean();
 
     // Fetch all student counts mapped by userId
-  const studentData = await Student.aggregate([
-  {
-    $group: {
-      _id: '$userId',
-      count: { $sum: 1 },
-      students: { $push: '$$ROOT' }  // Push full student docs
-    }
-  }
-]);
+    const counts = await Student.aggregate([
+      {
+        $group: {
+          _id: '$userId',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
 
-const studentMap = {};
-studentData.forEach(item => {
-  studentMap[item._id.toString()] = {
-    count: item.count,
-    students: item.students,
-  };
-});
-  const formatted = profiles.map((profile) => {
-  const uid = profile.userId?._id?.toString();
-  const studentInfo = studentMap[uid] || { count: 0, students: [] };
+    const studentCountMap = {};
+    counts.forEach(item => {
+      studentCountMap[item._id.toString()] = item.count;
+    });
 
-  return {
-    id: uid || null,
-    name: profile.userId?.name || 'Unknown',
-    email: profile.userId?.email || 'Unknown',
-    collegeName: profile.collegeName || '',
-    department: profile.department || '',
-    designation: profile.designation || '',
-    address: profile.address || '',
-    emergencyContact: profile.emergencyContact || '',
-    phone: profile.phone || '',
-    profileImage: profile.profileImage || null,
-    profileId: profile._id,
-    studentsCount: studentInfo.count,
-    students: studentInfo.students, // 🔥 student list here
-  };
-});
-
+    const formatted = profiles.map((profile) => {
+      const uid = profile.userId?._id?.toString();
+      return {
+        id: uid || null,
+        name: profile.userId?.name || 'Unknown',
+        email: profile.userId?.email || 'Unknown',
+        collegeName: profile.collegeName || '',
+        department: profile.department || '',
+        designation: profile.designation || '',
+        address: profile.address || '',
+        emergencyContact: profile.emergencyContact || '',
+        phone: profile.phone || '',
+        profileImage: profile.profileImage || null,
+        profileId: profile._id,
+        studentsCount: studentCountMap[uid] || 0, // 🔥 here is the count
+      };
+    });
 
     res.status(200).json(formatted);
   } catch (error) {
