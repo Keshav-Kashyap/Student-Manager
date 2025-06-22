@@ -207,6 +207,8 @@ const getAllUsersProfile = async (req, res) => {
       .populate('userId', 'name email') // join User fields
       .lean(); // optional: makes result faster (plain JS)
 
+      const count = students.filter((s) => s.userId === String(userId)).length;
+
     // Format response to merge userId fields into profile
     const formatted = profiles.map((profile) => ({
       id: profile.userId?._id || null,
@@ -220,7 +222,11 @@ const getAllUsersProfile = async (req, res) => {
       phone: profile.phone || '',
       profileImage: profile.profileImage || null,
       profileId: profile._id,
-     studentsCount:10,
+   studentsCount: Number.isInteger(count) ? count : 10,
+
+       joinDate: profile.userId?.createdAt 
+      ? new Date(profile.userId.createdAt).toLocaleDateString('en-IN') 
+      : 'Unknown',
     }));
 
     res.status(200).json(formatted);
