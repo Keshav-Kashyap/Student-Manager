@@ -9,8 +9,8 @@ import PrintIDCard from "./pages/PrintIDCard";
 import AddStudentPage from "./pages/AddStudentPage";
 import EditStudentPage from "./pages/EditStudentPage";
 import Help from "./pages/Help";
-import Login from "./pages/auth/Login";
-import Signup from "./pages/auth/Signup";
+import Login from "./pages/Auth/Login";
+import Signup from "./pages/Auth/Signup";
 import MobileNavigation from "./components/MobileNavigation";
 import { Toaster } from 'react-hot-toast';
 import FlashMessageProvider from "./components/common/FlashMessageProvider";
@@ -101,7 +101,7 @@ const AuthenticatedLayout = () => {
         closeSidebar();
       }
     };
-    
+
     if (typeof window !== 'undefined') {
       window.addEventListener("resize", handleResize);
       return () => window.removeEventListener("resize", handleResize);
@@ -130,12 +130,11 @@ const AuthenticatedLayout = () => {
         <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} className="h-[calc(100vh-64px)]" user={user} />
 
         <main
-          className={`flex-1 p-0 overflow-auto transition-all duration-300 ease-in-out ${
-            isSidebarOpen ? "lg:ml-80" : "lg:ml-0"
-          }`}
+          className={`flex-1 p-0 overflow-auto transition-all duration-300 ease-in-out ${isSidebarOpen ? "lg:ml-80" : "lg:ml-0"
+            }`}
         >
           <Outlet context={{ user, setUser: UserManager.saveUser, clearUser: UserManager.clearUser }} />
-          <MobileNavigation/>
+          <MobileNavigation />
         </main>
       </div>
     </div>
@@ -145,11 +144,11 @@ const AuthenticatedLayout = () => {
 // Helper component to check if user is logged in and route accordingly
 const ConditionalRoute = ({ component: Component, authPath }) => {
   const isLoggedIn = UserManager.getSavedUser();
-  
+
   if (isLoggedIn) {
     return <Navigate to={authPath} replace />;
   }
-  
+
   return <Component />;
 };
 
@@ -157,7 +156,7 @@ function App() {
   return (
     <>
       <FlashMessageProvider />
-      <ConfirmDialogProvider> 
+      <ConfirmDialogProvider>
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
@@ -176,20 +175,20 @@ function App() {
           </Route>
 
           {/* Conditional routes */}
-          <Route 
-            path="/help" 
-            element={<ConditionalRoute component={Help} authPath="/app/help" />} 
+          <Route
+            path="/help"
+            element={<ConditionalRoute component={Help} authPath="/app/help" />}
           />
-          <Route 
-            path="/about" 
-            element={<ConditionalRoute component={About} authPath="/app/about" />} 
+          <Route
+            path="/about"
+            element={<ConditionalRoute component={About} authPath="/app/about" />}
           />
 
           <Route path="/google-redirect" element={<GoogleRedirect />} />
-          <Route path="/verify-email" element={<VerifyEmailPage/>}/>
-          <Route path="/verify-email-cheak" element={<VerifyEmailPage/>}/>
-          <Route path="/forgot-password" element={<ForgotPassword/>}/>
-          <Route path="/reset-password" element={<ResetPassword/>}/>
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/verify-email-cheak" element={<VerifyEmailPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/create-profile" element={<EditProfile />} />
 
           {/* Protected Teacher Routes */}
