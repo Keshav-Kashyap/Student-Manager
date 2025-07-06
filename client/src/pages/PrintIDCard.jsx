@@ -10,7 +10,7 @@ import IDCardGrid from '../components/StudentId/IDCardGrid';
 import PrintStyles from '../components/StudentId/PrintStyles';
 import toast from 'react-hot-toast';
 import { handleDeleteStudent } from '../handlers/studentHandlers';
-import PrintStatsService from '../utils/printStatsService'; // ✅ your backend API-based service
+import PrintStatsService from '../Utils/printStatsService'; // ✅ your backend API-based service
 import { useConfirm } from '../context/ConfirmDialogContext';
 import { API_BASE } from '../config/api';
 
