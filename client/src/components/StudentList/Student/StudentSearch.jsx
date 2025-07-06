@@ -33,13 +33,9 @@ const StudentSearch = ({
             <Filter size={18} />
             Refresh
           </button>
-          <button 
-            onClick={onExport}
-            className="flex items-center gap-2 px-4 py-3 text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200"
-          >
-            <Download size={18} />
-            Export
-          </button>
+         
+    
+      
           {selectedCount > 0 && (
             <button 
               onClick={onDeleteSelected}

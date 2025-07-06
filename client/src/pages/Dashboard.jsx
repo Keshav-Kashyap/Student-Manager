@@ -6,35 +6,15 @@ import StatCard from '../components/StatCard';
 import UserWelcomeSection from '../components/dashboard/UserWelcomeSection';
 import ProfileCompletionAlert from '../components/dashboard/ProfileCompletionAlert';
 import UserProfileCard from '../components/dashboard/UserProfileCard';
+import PrintStatsService from '../utils/printStatsService';
+
+
 
 // Hooks
 import useStudents from '../Hooks/useStudent';
 
 // Print Statistics Service
-const PrintStatsService = {
-  getStats: () => {
-    const stats = localStorage.getItem('printStats');
-    return stats ? JSON.parse(stats) : {
-      totalPrints: 0,
-      todayPrints: 0,
-      thisWeekPrints: 0,
-      thisMonthPrints: 0,
-      lastPrintDate: null,
-      printHistory: []
-    };
-  },
 
-  getFormattedStats: () => {
-    const stats = PrintStatsService.getStats();
-    return {
-      total: stats.totalPrints,
-      today: stats.todayPrints,
-      week: stats.thisWeekPrints,
-      month: stats.thisMonthPrints,
-      lastPrint: stats.lastPrintDate ? new Date(stats.lastPrintDate).toLocaleDateString() : 'Never'
-    };
-  }
-};
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -51,61 +31,41 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
+  const updateStats = async () => {
     if (!studentsLoading && students) {
-      // Get print count from localStorage
-      const printStats = PrintStatsService.getFormattedStats();
-      
+      const printStats = await PrintStatsService.getFormattedStats(); // ✅ await here
+
       setStats(prevStats => ({
         ...prevStats,
         students: students.length,
-        printedId: printStats.total // Use total print count from localStorage
+        printedId: printStats.total
       }));
+
       setLoading(false);
     }
-  }, [students, studentsLoading]);
+  };
+
+  updateStats();
+}, [students, studentsLoading]);
 
   // Fetch dashboard data
   const fetchDashboardData = async () => {
     try {
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        console.error('No token found');
-        setLoading(false);
-        return;
-      }
+    
 
-      // Get print stats from localStorage instead of API
-      const printStats = PrintStatsService.getFormattedStats();
+      const printStats = await PrintStatsService.getFormattedStats(); // ✅ Use API-based stats
 
-      const response = await fetch('/api/dashboard/stats', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setStats({
-          students: stats.students || 0,
-          printedId: printStats.total // Use localStorage data instead of API
-        });
-      } else {
-        console.error('Failed to fetch dashboard data');
-        setStats({
-          students: 0,
-          printedId: printStats.total // Use localStorage data even if API fails
-        });
-      }
+      setStats(prev => ({
+        ...prev,
+        students: students.length,
+        printedId: printStats.total
+      }));
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      const printStats = PrintStatsService.getFormattedStats();
-      setStats({
-        students: 0,
-        printedId: printStats.total // Use localStorage data on error
-      });
+      console.error('Error fetching dashboard stats:', error);
+      setStats(prev => ({
+        ...prev,
+        printedId: 0
+      }));
     } finally {
       setLoading(false);
     }
@@ -129,30 +89,26 @@ const Dashboard = () => {
   // Fetch user profile from backend
   const fetchUserProfile = async () => {
     try {
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        console.error('No token found');
-        return;
-      }
+   
 
       const response = await fetch(`${API_BASE}/api/profile/me`, {
         method: 'GET',
+         credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
+        
           'Content-Type': 'application/json'
         }
       });
 
       if (response.ok) {
         const userData = await response.json();
-        
+
         const updatedUserData = {
           ...userData,
           isAuthenticated: true,
           lastFetch: new Date().toISOString()
         };
-        
+
         localStorage.setItem('user', JSON.stringify(updatedUserData));
         setUser(updatedUserData);
       } else {
@@ -166,10 +122,10 @@ const Dashboard = () => {
   };
 
   // Refresh stats function (to update print count in real-time)
-  const refreshStats = () => {
-    const printStats = PrintStatsService.getFormattedStats();
-    setStats(prevStats => ({
-      ...prevStats,
+  const refreshStats = async () => {
+    const printStats = await PrintStatsService.getFormattedStats();
+    setStats(prev => ({
+      ...prev,
       printedId: printStats.total
     }));
   };
@@ -181,20 +137,20 @@ const Dashboard = () => {
 
     // Refresh stats every 30 seconds to catch any print updates
     const interval = setInterval(refreshStats, 30000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
   const statsCards = [
-    { 
-      title: "Students", 
-      value: loading ? "..." : stats.students.toString(), 
-      icon: Users 
+    {
+      title: "Students",
+      value: loading ? "..." : stats.students.toString(),
+      icon: Users
     },
-    { 
-      title: "Printed ID Cards", 
-      value: loading ? "..." : stats.printedId.toString(), 
-      icon: Printer 
+    {
+      title: "Printed ID Cards",
+      value: loading ? "..." : stats.printedId.toString(),
+      icon: Printer
     }
   ];
 
@@ -211,7 +167,7 @@ const Dashboard = () => {
             </div>
             Dashboard
           </h1>
-          
+
           {/* User Welcome Section */}
           <UserWelcomeSection user={user} isProfileComplete={isProfileComplete} />
 
@@ -222,7 +178,7 @@ const Dashboard = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {statsCards.map((card, index) => (
-            <StatCard 
+            <StatCard
               key={index}
               title={card.title}
               value={card.value}
@@ -230,7 +186,7 @@ const Dashboard = () => {
             />
           ))}
         </div>
-        
+
         {/* User Profile Card */}
         <UserProfileCard user={user} />
       </div>

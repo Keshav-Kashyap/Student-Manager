@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import Header from '../components/StudentList/Layouts/header';
 import StudentSearch from '../components/StudentList/Student/StudentSearch';
 import StudentTable from '../components/StudentList/Student/StudentTable';
-import LoadingSpinner from '../components/StudentList/ui/LoadingSpinner';
+
 import ErrorMessage from '../components/StudentList/ui/ErrorMessage';
 import useStudents from '../Hooks/useStudent';
+import SurajPrintingLoader from '../components/common/loader'
 
 import { useNavigate } from 'react-router-dom';
 import {
@@ -63,7 +64,8 @@ const StudentListPage = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
 
         <Header onAddNewStudent={handleAddNewStudent} />
-        <LoadingSpinner message="Loading students..." />
+       <SurajPrintingLoader title="Loading Students..."  />
+
       </div>
     );
   }
@@ -83,7 +85,7 @@ const StudentListPage = () => {
 
       <Header onAddNewStudent={handleAddNewStudent} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mb-[50px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <StudentSearch
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}

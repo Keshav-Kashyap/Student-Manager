@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getHeaders } from '../services/studentService';
 import { API_BASE } from '../config/api';
 import toast from 'react-hot-toast';
 import {
@@ -38,58 +37,58 @@ const EditStudentPage = () => {
     fetchStudentData();
   }, [id]);
 
+  const fetchStudentData = async () => {
+    try {
+      console.log(id);
+      const response = await fetch(
+        `${API_BASE}/api/students/${id}`,
+        {
+          method: 'GET',
+          credentials: 'include', // Include cookies for authentication
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
 
+      const result2 = await response.json();
+      const result = result2.data;
 
-const fetchStudentData = async () => {
-  try {
-    console.log(id);
-    const response = await fetch(
-     `${API_BASE}/api/students/${id}`,
-      {
-        method: 'GET',
-        headers: getHeaders(), // ✅ Pass JWT + x-user-id here
+      console.log("🧪 API Result:", result);
+
+      if (response.ok) {
+        setFormData({
+          name: result.name || '',
+          fatherName: result.fatherName || '',
+          motherName: result.motherName || '',
+          class: result.class || '',
+          dateOfBirth: result.dateOfBirth ? result.dateOfBirth.split('T')[0] : '',
+          phone: result.phone || '',
+          address: result.address || '',
+          other: result.other || '',
+          photo: result.photoPath,
+        });
+
+        if (result.photoPath) {
+          const imageUrl = result.photoPath.startsWith('http')
+            ? result.photoPath
+            : `${API_BASE}/${result.photoPath}`;
+
+          setExistingPhotoUrl(imageUrl);
+          setPhotoPreview(imageUrl);
+        }
+      } else {
+        toast.error(result2.message || 'Failed to load student data');
+        navigate('/app/students');
       }
-    );
-
-    const result2 = await response.json();
-    const result = result2.data;
-
-    console.log("🧪 API Result:", result);
-
-    if (response.ok) {
-      setFormData({
-        name: result.name || '',
-        fatherName: result.fatherName || '',
-        motherName: result.motherName || '',
-        class: result.class || '',
-        dateOfBirth: result.dateOfBirth ? result.dateOfBirth.split('T')[0] : '',
-        phone: result.phone || '',
-        address: result.address || '',
-        other: result.other || '',
-        photo: result.photoPath,
-      });
-
-      if (result.photoPath) {
-        const imageUrl = result.photoPath.startsWith('http')
-  ? result.photoPath
-  : `${API_BASE}/${result.photoPath}`;
-
-        setExistingPhotoUrl(imageUrl);
-        setPhotoPreview(imageUrl);
-      }
-    } else {
-      toast.error(result2.message || 'Failed to load student data');
+    } catch (error) {
+      console.error('Error fetching student data:', error);
+      toast.error('Error loading student data');
       navigate('/app/students');
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('Error fetching student data:', error);
-   toast.error('Error loading student data');
-    navigate('/app/students');
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -104,7 +103,7 @@ const fetchStudentData = async () => {
     if (file) {
       // Check file type
       if (!file.type.startsWith('image/')) {
-       toast.error('Please select a valid image file');
+        toast.error('Please select a valid image file');
         return;
       }
       
@@ -161,15 +160,16 @@ const fetchStudentData = async () => {
 
     try {
       const response = await fetch(`${API_BASE}/api/students/${id}`, {
-  method: "PUT",
-  headers: getHeaders(true), // ✅ Pass headers (true = FormData, so no content-type)
-  body: submitData,
-});
+        method: "PUT",
+        credentials: 'include', // Include cookies for authentication
+        // Note: Don't set Content-Type header for FormData - browser sets it automatically
+        body: submitData,
+      });
 
       const result = await response.json();
 
       if (response.ok) {
-       toast.success("✅ Student updated successfully!");
+        toast.success("✅ Student updated successfully!");
         navigate('/app/students'); // Redirect to students list
       } else {
         toast.error(result.message || "❌ Failed to update student.");
@@ -177,7 +177,7 @@ const fetchStudentData = async () => {
       }
     } catch (error) {
       console.error("Update Error:", error);
-     toast.error("❌ Something went wrong while updating the student.");
+      toast.error("❌ Something went wrong while updating the student.");
     }
   };
 

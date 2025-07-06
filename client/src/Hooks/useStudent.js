@@ -54,6 +54,7 @@ const useStudents = () => {
     error,
     fetchStudents,
     deleteStudent,
+    setStudents,
     deleteMultipleStudents
   };
 };

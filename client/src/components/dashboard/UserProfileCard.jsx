@@ -13,7 +13,7 @@ const UserProfileCard = ({ user }) => {
   ];
 
   return (
-    <div className="mt-6 bg-white rounded-xl shadow-lg p-6">
+    <div className="mt-6 mb-[50px] bg-white rounded-xl shadow-lg p-6">
       <h3 className="text-xl font-bold text-gray-800 mb-4">Profile Information</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {profileFields.map((field, index) => (

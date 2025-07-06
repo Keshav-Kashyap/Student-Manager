@@ -1,6 +1,7 @@
 // 📁 src/hooks/useProfile.js
 import { useState, useEffect } from 'react';
 import { API_BASE } from '../config/api';
+
 const useProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,24 +20,23 @@ const useProfile = () => {
   };
 
   const fetchUserProfile = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setLoading(false);
-      setError('No token found');
-      return;
-    }
-
     try {
       setLoading(true);
       const res = await fetch(`${API_BASE}/api/profile/me`, {
         method: 'GET',
+        credentials: 'include', // Use cookies for authentication
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
 
       if (!res.ok) {
+        if (res.status === 401) {
+          // User is not authenticated
+          setError('Not authenticated');
+          clearProfile();
+          return;
+        }
         throw new Error('Failed to fetch profile');
       }
 
@@ -69,23 +69,21 @@ const useProfile = () => {
   };
 
   const createProfile = async (profileData) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('No token found');
-    }
-
     try {
       setLoading(true);
       const res = await fetch(`${API_BASE}/api/profile/create`, {
         method: 'POST',
+        credentials: 'include', // Use cookies for authentication
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(profileData)
       });
 
       if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error('Not authenticated');
+        }
         const errorData = await res.json();
         throw new Error(errorData.message || 'Failed to create profile');
       }
@@ -106,23 +104,21 @@ const useProfile = () => {
   };
 
   const updateProfile = async (profileData) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('No token found');
-    }
-
     try {
       setLoading(true);
       const res = await fetch(`${API_BASE}/api/profile/update`, {
         method: 'PUT',
+        credentials: 'include', // Use cookies for authentication
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(profileData)
       });
 
       if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error('Not authenticated');
+        }
         const errorData = await res.json();
         throw new Error(errorData.message || 'Failed to update profile');
       }

@@ -172,7 +172,7 @@ if (!formData.dateOfBirth.trim()) {
     const response = await fetch(`${API_BASE}/api/students`, {
 
         method: "POST",
-        headers: getHeaders(true), // ✅ include auth headers
+       credentials: 'include',
         body: submitData,
       });
 

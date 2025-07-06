@@ -11,6 +11,7 @@ import {
 const IDCardGrid = ({ students, deleteStudent, setSelectedStudents, printSettings }) => {
   const navigate = useNavigate();
 
+
   const onView = (id) => handleViewStudent(navigate, id);
   const onEdit = (id) => handleEditStudent(navigate, id);
   const onDelete = (id) => handleDeleteStudent(id, deleteStudent, setSelectedStudents);
@@ -32,7 +33,7 @@ const IDCardGrid = ({ students, deleteStudent, setSelectedStudents, printSetting
     <>
       <div className={`grid gap-4 sm:gap-6 ${getGridClass()} print:gap-4 justify-items-center`}>
         {students.map((student) => (
-          <div key={student._id} className="break-inside-avoid w-full max-w-sm">
+          <div key={student._id} className="break-inside-avoid w-full max-w-lg">
             <IDCard
               student={student}
               onView={onView}

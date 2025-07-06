@@ -1,4 +1,4 @@
-// components/MobileNavigation.jsx
+// components/MobileNavigation.jsx - Updated with proper spacing
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getMobileNavigationItems } from '../constants/navigationItems';
@@ -19,7 +19,7 @@ const MobileNavigation = () => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path ||
                            (item.id === 'students' && location.pathname.includes('/students'));
-                     
+                          
           return (
             <button
               key={item.id}

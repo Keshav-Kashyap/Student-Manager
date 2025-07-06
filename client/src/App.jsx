@@ -1,3 +1,4 @@
+// App.js
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Outlet, Navigate, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
@@ -8,17 +9,31 @@ import PrintIDCard from "./pages/PrintIDCard";
 import AddStudentPage from "./pages/AddStudentPage";
 import EditStudentPage from "./pages/EditStudentPage";
 import Help from "./pages/Help";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+import Login from "./pages/auth/Login";
+import Signup from "./pages/auth/Signup";
 import MobileNavigation from "./components/MobileNavigation";
 import { Toaster } from 'react-hot-toast';
 import FlashMessageProvider from "./components/common/FlashMessageProvider";
-import ConfirmDialog from "./components/common/ConfirmDialog";
+import { ConfirmDialogProvider } from './context/ConfirmDialogContext';
 import LandingPage from "./pages/LandingPage";
 import About from "./pages/About";
 import EditProfile from "./pages/EditProfile";
 import PageNotFound from "./pages/page404";
 import ViewStudentIDCardPage from "./pages/ViewStudent";
+import GoogleRedirect from "./pages/Auth/Google-redirect";
+import Admindashboard from "./pages/Admindashboard"
+import UserManagement from "./pages/UserManagement";
+import UserDetailedPage from "./pages/UserDetailedPage";
+import AdminViewStudent from "./pages/AdminViewStudent";
+import AdminLayout from "./Layouts/AdminLayout";
+import SurajPrintingLoader from './components/common/loader'
+import VerifyEmailPage from './pages/Auth/EmailConfirmation'
+import ForgotPassword from "./pages/Auth/ForgotPassword";
+import ResetPassword from "./pages/Auth/ResetPassword";
+import ProtectedRoute from "./components/common/ProtectedRoute";
+import { UserManager } from "./Utils/UserManager";
+
+
 
 const AuthenticatedLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -26,24 +41,11 @@ const AuthenticatedLayout = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Safe localStorage access
-  const getSavedUser = () => {
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        const savedUser = localStorage.getItem("user");
-        return savedUser ? JSON.parse(savedUser) : null;
-      }
-    } catch (error) {
-      console.error('Error accessing localStorage:', error);
-    }
-    return null;
-  };
-
-  // Load user data from localStorage and redirect if no user
+  // Load user data and set up listeners
   useEffect(() => {
     const loadUserData = () => {
       try {
-        const savedUser = getSavedUser();
+        const savedUser = UserManager.getSavedUser();
         if (savedUser) {
           setUser(savedUser);
         } else {
@@ -52,6 +54,7 @@ const AuthenticatedLayout = () => {
         }
       } catch (error) {
         console.error('Error loading user data:', error);
+        UserManager.clearUser();
         navigate("/login", { replace: true });
       } finally {
         setLoading(false);
@@ -59,6 +62,32 @@ const AuthenticatedLayout = () => {
     };
 
     loadUserData();
+
+    // Listen for user data changes
+    const handleUserDataChange = (event) => {
+      const userData = event.detail;
+      if (userData) {
+        setUser(userData);
+      } else {
+        setUser(null);
+        navigate("/login", { replace: true });
+      }
+    };
+
+    // Listen for localStorage changes (cross-tab sync)
+    const handleStorageChange = (e) => {
+      if (e.key === 'user') {
+        loadUserData();
+      }
+    };
+
+    window.addEventListener('userDataChanged', handleUserDataChange);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('userDataChanged', handleUserDataChange);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, [navigate]);
 
   // Sidebar togglers
@@ -81,9 +110,7 @@ const AuthenticatedLayout = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen text-xl font-semibold">
-        Loading...
-      </div>
+      <SurajPrintingLoader title="Loading..." />
     );
   }
 
@@ -107,7 +134,7 @@ const AuthenticatedLayout = () => {
             isSidebarOpen ? "lg:ml-80" : "lg:ml-0"
           }`}
         >
-          <Outlet context={{ user, setUser }} />
+          <Outlet context={{ user, setUser: UserManager.saveUser, clearUser: UserManager.clearUser }} />
           <MobileNavigation/>
         </main>
       </div>
@@ -117,25 +144,12 @@ const AuthenticatedLayout = () => {
 
 // Helper component to check if user is logged in and route accordingly
 const ConditionalRoute = ({ component: Component, authPath }) => {
-  const getSavedUser = () => {
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        return localStorage.getItem("user");
-      }
-    } catch (error) {
-      console.error('Error accessing localStorage:', error);
-    }
-    return null;
-  };
-
-  const isLoggedIn = getSavedUser();
+  const isLoggedIn = UserManager.getSavedUser();
   
   if (isLoggedIn) {
-    // User is logged in, redirect to authenticated version
     return <Navigate to={authPath} replace />;
   }
   
-  // User is not logged in, show full page component
   return <Component />;
 };
 
@@ -143,65 +157,72 @@ function App() {
   return (
     <>
       <FlashMessageProvider />
-      <ConfirmDialog/>
+      <ConfirmDialogProvider> 
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
 
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        
-        {/* Conditional routes - full page if not logged in, redirect to app version if logged in */}
-        <Route 
-          path="/help" 
-          element={<ConditionalRoute component={Help} authPath="/app/help" />} 
-        />
-        <Route 
-          path="/about" 
-          element={<ConditionalRoute component={About} authPath="/app/about" />} 
-        />
+          {/* Protected Admin Routes */}
+          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<Admindashboard />} />
+              <Route path="users" element={<UserManagement />} />
+              <Route path="users/:id" element={<UserDetailedPage />} />
+              <Route path="student/view/:id" element={<AdminViewStudent />} />
+            </Route>
+          </Route>
 
-        {/* Profile creation (full screen, no layout) */}
-        <Route path="/create-profile" element={<EditProfile />} />
+          {/* Conditional routes */}
+          <Route 
+            path="/help" 
+            element={<ConditionalRoute component={Help} authPath="/app/help" />} 
+          />
+          <Route 
+            path="/about" 
+            element={<ConditionalRoute component={About} authPath="/app/about" />} 
+          />
 
-        {/* Protected app routes */}
-        <Route path="/app" element={<AuthenticatedLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="students" element={<StudentList />} />
-          <Route path="students/add" element={<AddStudentPage />} />
-          
-          {/* Standardized edit route - use only one pattern */}
-          <Route path="students/edit/:id" element={<EditStudentPage />} />
-          
-          {/* View student route */}
-          <Route path="student/view/:id" element={<ViewStudentIDCardPage />} />
-          
-          <Route path="print" element={<PrintIDCard />} />
-          
-          {/* Help and About pages - shows with layout for logged in users */}
-          <Route path="help" element={<Help />} />
-          <Route path="about" element={<About />} />
-          
-          <Route path="edit" element={<EditProfile />} />
-        </Route>
+          <Route path="/google-redirect" element={<GoogleRedirect />} />
+          <Route path="/verify-email" element={<VerifyEmailPage/>}/>
+          <Route path="/verify-email-cheak" element={<VerifyEmailPage/>}/>
+          <Route path="/forgot-password" element={<ForgotPassword/>}/>
+          <Route path="/reset-password" element={<ResetPassword/>}/>
+          <Route path="/create-profile" element={<EditProfile />} />
 
-        {/* Redirect old routes to new standardized routes */}
-        <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
-        <Route path="/students" element={<Navigate to="/app/students" replace />} />
-        <Route path="/print" element={<Navigate to="/app/print" replace />} />
-        <Route path="/add_new_student" element={<Navigate to="/app/students/add" replace />} />
-        <Route path="/edit" element={<Navigate to="/app/edit" replace />} />
-        <Route path="/app/create-profile" element={<Navigate to="/create-profile" replace />} />
-        
-        {/* Redirect old edit routes to new standardized route */}
-        <Route path="/edit_student/:id" element={<Navigate to="/app/students/edit/:id" replace />} />
-        <Route path="/app/edit_student/:id" element={<Navigate to="/app/students/edit/:id" replace />} />
-        <Route path="/app/student/edit/:id" element={<Navigate to="/app/students/edit/:id" replace />} />
+          {/* Protected Teacher Routes */}
+          <Route element={<ProtectedRoute allowedRoles={["teacher"]} />}>
+            <Route path="/app" element={<AuthenticatedLayout />}>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="students" element={<StudentList />} />
+              <Route path="students/add" element={<AddStudentPage />} />
+              <Route path="students/edit/:id" element={<EditStudentPage />} />
+              <Route path="student/view/:id" element={<ViewStudentIDCardPage />} />
+              <Route path="print" element={<PrintIDCard />} />
+              <Route path="help" element={<Help />} />
+              <Route path="about" element={<About />} />
+              <Route path="edit" element={<EditProfile />} />
+            </Route>
+          </Route>
 
-        {/* 404 */}
-        <Route path="*" element={<PageNotFound />} />
-      </Routes>
+          {/* Redirects */}
+          <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
+          <Route path="/students" element={<Navigate to="/app/students" replace />} />
+          <Route path="/print" element={<Navigate to="/app/print" replace />} />
+          <Route path="/add_new_student" element={<Navigate to="/app/students/add" replace />} />
+          <Route path="/edit" element={<Navigate to="/app/edit" replace />} />
+          <Route path="/app/create-profile" element={<Navigate to="/create-profile" replace />} />
+          <Route path="/edit_student/:id" element={<Navigate to="/app/students/edit/:id" replace />} />
+          <Route path="/app/edit_student/:id" element={<Navigate to="/app/students/edit/:id" replace />} />
+          <Route path="/app/student/edit/:id" element={<Navigate to="/app/students/edit/:id" replace />} />
+
+          {/* 404 */}
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </ConfirmDialogProvider>
     </>
   );
 }

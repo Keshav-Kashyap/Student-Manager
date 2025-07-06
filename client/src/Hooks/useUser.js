@@ -20,18 +20,11 @@ const useUser = () => {
   };
 
   const fetchUserProfile = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setLoading(false);
-      setError('No token found');
-      return;
-    }
-
     try {
       const res = await fetch(`${API_BASE}/api/profile/me`, {
         method: 'GET',
+        credentials: 'include', // Include cookies for authentication
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });

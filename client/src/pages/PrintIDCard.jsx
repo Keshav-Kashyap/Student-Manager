@@ -1,7 +1,7 @@
 // pages/StudentIDPrintPage.jsx
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, Printer, FileText, BarChart3 } from 'lucide-react';
-import LoadingSpinner from '../components/StudentList/ui/LoadingSpinner';
+import SurajPrintingLoader from '../components/common/loader'
 import ErrorMessage from '../components/StudentList/ui/ErrorMessage';
 import useStudents from '../Hooks/useStudent';
 import PrintHeader from '../components/StudentId/PrintHeader';
@@ -10,106 +10,20 @@ import IDCardGrid from '../components/StudentId/IDCardGrid';
 import PrintStyles from '../components/StudentId/PrintStyles';
 import toast from 'react-hot-toast';
 import { handleDeleteStudent } from '../handlers/studentHandlers';
-
-// Print Statistics Service
-const PrintStatsService = {
-  // Get all print statistics
-  getStats: () => {
-    const stats = localStorage.getItem('printStats');
-    return stats ? JSON.parse(stats) : {
-      totalPrints: 0,
-      todayPrints: 0,
-      thisWeekPrints: 0,
-      thisMonthPrints: 0,
-      lastPrintDate: null,
-      printHistory: []
-    };
-  },
-
-  // Update print statistics
-  updateStats: (printedCount) => {
-    const now = new Date();
-    const today = now.toDateString();
-    const currentStats = PrintStatsService.getStats();
-    
-    // Calculate week and month boundaries
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay());
-    startOfWeek.setHours(0, 0, 0, 0);
-    
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    
-    // Reset daily count if new day
-    if (currentStats.lastPrintDate !== today) {
-      currentStats.todayPrints = 0;
-      
-      // Reset weekly count if new week
-      const lastPrintDate = new Date(currentStats.lastPrintDate);
-      if (lastPrintDate < startOfWeek) {
-        currentStats.thisWeekPrints = 0;
-      }
-      
-      // Reset monthly count if new month
-      if (lastPrintDate < startOfMonth) {
-        currentStats.thisMonthPrints = 0;
-      }
-    }
-    
-    // Update counts
-    const updatedStats = {
-      totalPrints: currentStats.totalPrints + printedCount,
-      todayPrints: currentStats.todayPrints + printedCount,
-      thisWeekPrints: currentStats.thisWeekPrints + printedCount,
-      thisMonthPrints: currentStats.thisMonthPrints + printedCount,
-      lastPrintDate: today,
-      printHistory: [
-        ...currentStats.printHistory,
-        {
-          date: now.toISOString(),
-          count: printedCount,
-          timestamp: now.getTime()
-        }
-      ].slice(-50) // Keep only last 50 print records
-    };
-    
-    localStorage.setItem('printStats', JSON.stringify(updatedStats));
-    return updatedStats;
-  },
-
-  // Clear all statistics (for reset functionality)
-  clearStats: () => {
-    localStorage.removeItem('printStats');
-  },
-
-  // Get formatted stats for display
-  getFormattedStats: () => {
-    const stats = PrintStatsService.getStats();
-    return {
-      total: stats.totalPrints,
-      today: stats.todayPrints,
-      week: stats.thisWeekPrints,
-      month: stats.thisMonthPrints,
-      lastPrint: stats.lastPrintDate ? new Date(stats.lastPrintDate).toLocaleDateString() : 'Never'
-    };
-  }
-};
+import PrintStatsService from '../utils/printStatsService'; // ✅ your backend API-based service
+import { useConfirm } from '../context/ConfirmDialogContext';
+import { API_BASE } from '../config/api';
 
 // Print Statistics Component
-const PrintStatsBar = ({ stats, onReset }) => (
+const PrintStatsBar = ({ stats }) => (
   <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
     <div className="flex items-center justify-between mb-4">
       <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
         <BarChart3 className="w-5 h-5" />
         Print Statistics
       </h3>
-      <button
-        onClick={onReset}
-        className="text-sm text-red-600 hover:text-red-800 px-3 py-1 rounded border border-red-200 hover:border-red-300 transition-colors"
-      >
-        Reset Stats
-      </button>
     </div>
-    
+
     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
       <div className="text-center p-3 bg-blue-50 rounded-lg">
         <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
@@ -144,13 +58,17 @@ const StudentIDPrintPage = () => {
 
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
-  const [printStats, setPrintStats] = useState(PrintStatsService.getFormattedStats());
+  const [printStats, setPrintStats] = useState(null);
+  const [isPrinting, setIsPrinting] = useState(false);
+  const confirm = useConfirm(); 
+  const { students, setStudents, loading, error, fetchStudents, deleteStudent } = useStudents();
 
-  const { students, loading, error, fetchStudents, deleteStudent } = useStudents();
-
-  // Update stats on component mount
   useEffect(() => {
-    setPrintStats(PrintStatsService.getFormattedStats());
+    const fetchStats = async () => {
+      const backendStats = await PrintStatsService.getFormattedStats();
+      setPrintStats(backendStats);
+    };
+    fetchStats();
   }, []);
 
   const handleSelectAll = (e) => {
@@ -168,7 +86,7 @@ const StudentIDPrintPage = () => {
       const newSelection = prev.includes(studentId)
         ? prev.filter(id => id !== studentId)
         : [...prev, studentId];
-      
+
       setSelectAll(newSelection.length === students.length);
       return newSelection;
     });
@@ -178,45 +96,72 @@ const StudentIDPrintPage = () => {
     ? students.filter(student => selectedStudents.includes(student._id))
     : students;
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     if (studentsToPrint.length === 0) {
       toast.error('No students to print!');
       return;
     }
 
-    // Show confirmation with count
-    const confirmMessage = `Print ${studentsToPrint.length} student ID card${studentsToPrint.length > 1 ? 's' : ''}?`;
-    if (!window.confirm(confirmMessage)) {
-      return;
+    const confirmed = await confirm(
+      "Are you sure you want to print selected students' ID cards?",
+      "Print ID Cards"
+    );
+    
+    if (confirmed) {
+      handleConfirmPrint();
     }
-
-    // Update print statistics
-    const updatedStats = PrintStatsService.updateStats(studentsToPrint.length);
-    setPrintStats(PrintStatsService.getFormattedStats());
-
-    // Show success message
-    toast.success(`Printing ${studentsToPrint.length} ID cards!`, {
-      duration: 3000,
-      icon: '🖨️'
-    });
-
-    // Trigger print
-    window.print();
-
-    // Optional: Clear selection after printing
-    setSelectedStudents([]);
-    setSelectAll(false);
   };
 
-  const handleExportPDF = () => {
+  const handleConfirmPrint = async () => {
+    setIsPrinting(true);
+
+    try {
+      const studentIds = studentsToPrint.map(student => student._id);
+
+      const response = await fetch(`${API_BASE}/api/students/update-print-status`, {
+        method: 'PUT',
+        credentials: 'include', // Include cookies for authentication
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          studentIds,
+          printStatus: 'printed',
+          printedAt: new Date().toISOString()
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update print status');
+
+      await fetchStudents();
+
+      const updatedStats = await PrintStatsService.getFormattedStats();
+      setPrintStats(updatedStats);
+
+      toast.success(`Sent ${studentsToPrint.length} ID card(s) to print queue ✅`, {
+        duration: 3000,
+        icon: '📤'
+      });
+
+      setSelectedStudents([]);
+      setSelectAll(false);
+    } catch (error) {
+      console.error('Error updating print status:', error);
+      toast.error('Failed to send to print. Please try again.');
+    } finally {
+      setIsPrinting(false);
+    }
+  };
+
+  const handleExportPDF = async () => {
     if (studentsToPrint.length === 0) {
       toast.error('No students to export!');
       return;
     }
 
     // Update print statistics for PDF export too
-    const updatedStats = PrintStatsService.updateStats(studentsToPrint.length);
-    setPrintStats(PrintStatsService.getFormattedStats());
+    const updatedStats = await PrintStatsService.getFormattedStats();
+    setPrintStats(updatedStats);
 
     toast.success(`Exporting ${studentsToPrint.length} ID cards to PDF!`, {
       duration: 3000,
@@ -226,16 +171,10 @@ const StudentIDPrintPage = () => {
     console.log('PDF export functionality to be implemented');
   };
 
-  const handleResetStats = () => {
-    if (window.confirm('Are you sure you want to reset all print statistics? This cannot be undone.')) {
-      PrintStatsService.clearStats();
-      setPrintStats(PrintStatsService.getFormattedStats());
-      toast.success('Print statistics reset successfully!');
-    }
-  };
-
-  if (loading) {
-    return <LoadingSpinner message="Loading students for ID cards..." />;
+  if (loading || isPrinting) {
+    return (
+      <SurajPrintingLoader title="Students Id Cards Are Fetching..." subtitle="Loading students for ID cards..." />
+    );
   }
 
   if (error) {
@@ -247,7 +186,7 @@ const StudentIDPrintPage = () => {
       {/* Print Statistics Bar */}
       <div className="print:hidden bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <PrintStatsBar stats={printStats} onReset={handleResetStats} />
+          <PrintStatsBar stats={printStats} />
         </div>
       </div>
 
@@ -268,7 +207,7 @@ const StudentIDPrintPage = () => {
         onSelectStudent={handleSelectStudent}
       />
 
-      <div className="print:p-0 p-8">
+      <div className="print:p-0 p-8 mb-[50px] ">
         <div className="max-w-7xl mx-auto">
           {studentsToPrint.length === 0 ? (
             <EmptyState onRefresh={fetchStudents} />
