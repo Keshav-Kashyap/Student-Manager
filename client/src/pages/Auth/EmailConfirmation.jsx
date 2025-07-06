@@ -1,6 +1,6 @@
   // VerifyEmailPage.jsx - FIXED VERSION
   import React, { useState, useEffect } from 'react';
-  import { TokenVerificationService, useTokenVerification } from '../../utils/tokenVerification';
+  import { TokenVerificationService, useTokenVerification } from '../../Utils/tokenVerification';
   import AuthLayout from '../../components/auth/AuthLayout';
   import AuthHeader from '../../components/auth/AuthHeader';
   import AuthButton from '../../components/auth/AuthButton';

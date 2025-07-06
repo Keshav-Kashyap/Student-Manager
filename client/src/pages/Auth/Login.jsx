@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authAPI } from '../../services/api';
 import { API_BASE } from "../../config/api";
 import toast from 'react-hot-toast';
-import { TokenVerificationService } from '../../utils/tokenVerification';
+import { TokenVerificationService } from '../../Utils/tokenVerification';
 import { User, Mail, Lock, LogIn } from "lucide-react";
 // Import reusable components
 import AuthLayout from '../../components/auth/AuthLayout';
