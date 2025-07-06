@@ -6,7 +6,7 @@ import StatCard from '../components/StatCard';
 import UserWelcomeSection from '../components/dashboard/UserWelcomeSection';
 import ProfileCompletionAlert from '../components/dashboard/ProfileCompletionAlert';
 import UserProfileCard from '../components/dashboard/UserProfileCard';
-import PrintStatsService from '../utils/printStatsService';
+import PrintStatsService from '../Utils/printStatsService';
 
 
 
