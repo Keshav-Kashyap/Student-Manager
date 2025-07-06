@@ -12,10 +12,9 @@ const api = axios.create({
   withCredentials: true // 🔑 Essential for cookie-based auth
 });
 
-// ✅ Request Interceptor - No need to manually add token since it's in cookies
+// ✅ Request Interceptor
 api.interceptors.request.use(
   (config) => {
-    
     console.log(`📡 ${config.method?.toUpperCase()} ${config.url}`, config.data);
     return config;
   },
@@ -25,8 +24,7 @@ api.interceptors.request.use(
   }
 );
 
-
-// ✅ Response Interceptor - Handle cookie expiration
+// ✅ Response Interceptor
 api.interceptors.response.use(
   (response) => {
     console.log('✅ API Response:', response.status, response.data);
@@ -62,18 +60,10 @@ export const authAPI = {
       console.log('✅ Login response:', response.data);
 
       if (response.data.success) {
-        // Don't store token - it's in httpOnly cookie
-        if(response.data.token){
-console.log("Token aa chuka hai ");
-
-      }else{
-        console.log("Token not found and not store");
-      }
-
-        // Only store user data for UI purposes
+        // Store user data for UI purposes
         if (response.data.user) {
           localStorage.setItem('user', JSON.stringify(response.data.user));
-          // localStorage.setItem('isAuthenticated', 'true');
+          localStorage.setItem('isAuthenticated', 'true');
         }
 
         console.log('✅ Login successful, user data saved');
@@ -105,13 +95,6 @@ console.log("Token aa chuka hai ");
           console.log('📧 Email verification required');
           return response.data;
         }
-        if (response.data.token) {
-          console.log("Your Token:",response.data.token)
-        }
-        if (!response.data.token) {
-          console.log("Your Token is not exits");
-        }
-
 
         // If no verification needed, save user data
         if (response.data.user) {
@@ -173,15 +156,39 @@ console.log("Token aa chuka hai ");
   // ✅ Fetch fresh user data from server (uses cookie automatically)
   refreshUser: async () => {
     try {
+      console.log('🔄 Refreshing user data...');
       const response = await api.get('/users/profile');
+      
+      console.log('✅ Refresh user response:', response.data);
+      
       if (response.data.success) {
-        localStorage.setItem('user', JSON.stringify(response.data.data));
-        return response.data.data;
+        const userData = response.data.data || response.data.user;
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('isAuthenticated', 'true');
+        return userData;
       }
       return null;
     } catch (error) {
-      console.error('❌ Error refreshing user:', error);
-      return null;
+      console.error('❌ Error refreshing user:', error.response?.data || error.message);
+      
+      // If 401, clear auth data
+      if (error.response?.status === 401) {
+        localStorage.removeItem('user');
+        localStorage.removeItem('isAuthenticated');
+      }
+      
+      throw error;
+    }
+  },
+
+  // ✅ Check auth status from server
+  checkAuthStatus: async () => {
+    try {
+      const response = await api.get('/users/status');
+      return response.data;
+    } catch (error) {
+      console.error('❌ Auth status check error:', error);
+      throw error;
     }
   },
 
@@ -206,7 +213,7 @@ console.log("Token aa chuka hai ");
     }
   },
 
-  // ✅ 🔑 FORGOT PASSWORD - Send reset email
+  // ✅ Password reset methods
   forgotPassword: async (email) => {
     try {
       console.log('📧 Requesting password reset for:', email);
@@ -223,7 +230,6 @@ console.log("Token aa chuka hai ");
     }
   },
 
-  // ✅ 🔐 RESET PASSWORD - Reset with token
   resetPassword: async (token, newPassword) => {
     try {
       console.log('🔐 Resetting password with token:', token);
