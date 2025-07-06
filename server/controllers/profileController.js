@@ -1,5 +1,6 @@
 const Profile = require('../models/Profile');
 const User = require('../models/User');
+const Student = require('../models/Student');
 
 // Create Profile
 const createProfile = async (req, res) => {
@@ -19,13 +20,13 @@ const createProfile = async (req, res) => {
     console.log("📥 Incoming Profile Data:", req.body);
     console.log("🔐 Authenticated User:", req.user);
 
-    // Check if profile already exists for user
+    // ✅ Check if profile already exists
     const existing = await Profile.findOne({ userId: req.user.id });
     if (existing) {
       return res.status(400).json({ message: 'Profile already exists' });
     }
 
-    // Update User model with name and email if provided
+    // ✅ Optionally update user name/email
     if (name || email) {
       await User.findByIdAndUpdate(req.user.id, {
         ...(name && { name }),
@@ -33,7 +34,7 @@ const createProfile = async (req, res) => {
       });
     }
 
-    // Create new profile
+    // ✅ Create profile
     const profile = await Profile.create({
       userId: req.user.id,
       collegeName,
@@ -45,7 +46,10 @@ const createProfile = async (req, res) => {
       profileImage
     });
 
-    // Return complete profile with user data
+    // ✅ Update hasProfile to true
+    await User.findByIdAndUpdate(req.user.id, { hasProfile: true });
+
+    // ✅ Fetch complete profile with user info
     const completeProfile = await Profile.findById(profile._id)
       .populate('userId', 'name email');
 
@@ -72,6 +76,7 @@ const createProfile = async (req, res) => {
     res.status(500).json({ message: 'Error creating profile', error: err.message });
   }
 };
+
 
 // Get Profile (with user name & email)
 const getProfile = async (req, res) => {
@@ -201,40 +206,8 @@ const updateProfile = async (req, res) => {
 };
 
 
-const getAllUsersProfile = async (req, res) => {
-  try {
-    const profiles = await Profile.find()
-      .populate('userId', 'name email createdAt role studentsCount') // join User fields
-      .lean(); // optional: makes result faster (plain JS)
 
-      const count =10
 
-    // Format response to merge userId fields into profile
-    const formatted = profiles.map((profile) => ({
-      id: profile.userId?._id || null,
-      name: profile.userId?.name || 'Unknown',
-      email: profile.userId?.email || 'Unknown',
-      collegeName: profile.collegeName || '',
-      department: profile.department || '',
-      designation: profile.designation || '',
-      address: profile.address || '',
-      emergencyContact: profile.emergencyContact || '',
-      phone: profile.phone || '',
-      profileImage: profile.profileImage || null,
-      profileId: profile._id,
-   studentsCount: profile.userId?.studentsCount,
-
-    joinDate: profile.userId?.createdAt 
-      ? new Date(profile.userId.createdAt).toLocaleDateString('en-IN') 
-      : 'Unknown',
-    }));
-
-    res.status(200).json(formatted);
-  } catch (error) {
-    console.error('❌ Error getting all users:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
 
 
 
@@ -242,5 +215,4 @@ module.exports = {
   createProfile,
   getProfile,
   updateProfile,
-  getAllUsersProfile,
 };

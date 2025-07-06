@@ -1,16 +1,27 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const passport = require('passport'); 
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+
 
 // Import routes
 const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes'); // ✅ Add this line
+
 const studentRoutes = require('./routes/studentRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const createAdmin = require('./routes/createAdminRoutes')
+const adminRoute = require('./routes/adminRoute')
+
+
+
 dotenv.config();
 const app = express();
+app.set('trust proxy', 1);
 
 // ✅ CORS setup — allow all origins for development, restrict for production
 const allowedOrigins = [
@@ -19,6 +30,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'https://student-manager-client.onrender.com'
 ];
+
 
 
 // app.use('/create-admin', createAdmin)
@@ -43,10 +55,24 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id']
 }));
 
+
+
 // ✅ Middleware
 app.use(express.json({ limit: '10mb' }));
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
+app.use(session({
+  resave: false,
+  saveUninitialized: false, // ✅ safer & recommended
+  secret: process.env.SESSION_SECRET,
+  cookie: {
+    secure: false, // ❌ change to true in production with https
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24 // 1 day
+  }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 // ✅ Request logging middleware for debugging
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
@@ -58,6 +84,10 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+
+app.use('/auth', authRoutes);
+
 
 // ✅ Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
@@ -79,7 +109,8 @@ app.get('/', (req, res) => {
     routes: [
       '/api/users',
       '/api/students', 
-      '/api/profile'
+      '/api/profile',
+      '/api/admin/dashboard',
     ]
   });
 });
@@ -88,6 +119,8 @@ app.get('/', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/admin', adminRoute);
+
 
 // ✅ Route not found handler
 app.use('*', (req, res) => {

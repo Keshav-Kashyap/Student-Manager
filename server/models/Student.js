@@ -48,6 +48,22 @@ const studentSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  printStatus: {
+  type: String,
+  enum: ['not_sent', 'sent_to_print', 'printed', 'delivered'],
+  default: 'not_sent',
+},
+
+ printedAt: {
+    type: Date,
+    default: null
+  },
+  updatedAfterPrint: {
+    type: Boolean,
+    default: false
+  },
+
+
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -56,5 +72,22 @@ const studentSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+
+studentSchema.pre('save', function (next) {
+  // Only reset if a printed student's info was updated (but not when status is being updated to 'printed')
+  if (
+    this.isModified() &&
+    this.printStatus === 'printed' &&
+    !this.isModified('printStatus') &&
+    !this.isModified('printedAt')
+  ) {
+    this.printStatus = 'not_sent';
+    this.printedAt = null;
+    this.updatedAfterPrint = true;
+  }
+  next();
+});
+
 
 module.exports = mongoose.model('Student', studentSchema);

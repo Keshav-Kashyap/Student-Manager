@@ -54,14 +54,18 @@ const getAllStudents = async (req, res) => {
 
     const students = await Student.find({ createdBy: userId }).populate('createdBy', 'name email').sort({ createdAt: -1 });
 
+     const totalCount = await Student.countDocuments();
+    console.log("total Students",totalCount);
+
     res.status(200).json({
       success: true,
       count: students.length,
+       totalCount,
       data: students,
       message: students.length === 0 ? 'No students found for this user' : 'Students retrieved successfully'
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message || 'Error fetching students', data: [], count: 0 });
+    res.status(500).json({ success: false, message: error.message || 'Error fetching students', data: [], count: 0, totalCount:0, });
   }
 };
 
@@ -188,10 +192,13 @@ const searchStudents = async (req, res) => {
 };
 
 // ========== STUDENT STATISTICS ==========
+// ========== STUDENT STATISTICS ==========
 const getStudentStats = async (req, res) => {
   try {
     const userId = getUserId(req);
-    if (!userId) return res.status(401).json({ success: false, message: 'User identification required.' });
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'User identification required.' });
+    }
 
     const totalStudents = await Student.countDocuments({ createdBy: userId });
 
@@ -201,21 +208,35 @@ const getStudentStats = async (req, res) => {
       { $sort: { _id: 1 } }
     ]);
 
+    const printStatusStats = await Student.aggregate([
+      { $match: { createdBy: userId } },
+      { $group: { _id: '$printStatus', count: { $sum: 1 } } }
+    ]);
+
     const recentStudents = await Student.find({ createdBy: userId })
-      .sort({ createdAt: -1 }).limit(5).select('name class createdAt');
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('name class createdAt printStatus');
 
     res.status(200).json({
       success: true,
       data: {
         totalStudents,
         classStats,
+        printStatusStats, // ✅ added
         recentStudents
       }
     });
+
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message || 'Error fetching student statistics' });
+    console.error('❌ Error in getStudentStats:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching student statistics'
+    });
   }
 };
+
 
 // ========== EXPORT ==========
 module.exports = {
