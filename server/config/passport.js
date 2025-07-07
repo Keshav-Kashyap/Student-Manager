@@ -21,7 +21,7 @@ passport.deserializeUser(async (id, done) => {
 passport.use(new GoogleStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: "https://student-manager-backend-zbjw.onrender.com/auth/google/callback",
+ callbackURL: "https://student-manager-backend-zbjw.onrender.com/auth/google/callback",
   passReqToCallback: true
 }, async (req, accessToken, refreshToken, profile, done) => {
   try {
@@ -95,7 +95,7 @@ const successGoogleLogin = async (req, res) => {
     });
 
     // ✅ Set token in HTTP-only cookie
-    res.cookie('token', token, {
+    res.cookie('jwt', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
   sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',

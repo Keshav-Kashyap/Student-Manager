@@ -218,6 +218,8 @@ const getCurrentUser = async (req, res) => {
       });
     }
     
+console.log("YOUR USER FOUNDED:",user);
+
     res.status(200).json({
       success: true,
       data: user
@@ -272,14 +274,14 @@ const successGoogleLogin = async (req, res) => {
     const user = req.user;
     
     console.log("✅ Google login success for user:", user.email);
-
+    console.log("YOUR USERS:",user);
     // ✅ Generate new token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: '7d'
     });
 
     // ✅ Set token in HTTP-only cookie
-    res.cookie('token', token, {
+    res.cookie('jwt', token, {
       httpOnly: true,
        secure: process.env.NODE_ENV === 'production',
   sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
