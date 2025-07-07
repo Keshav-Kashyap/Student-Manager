@@ -9,7 +9,7 @@ const useProfile = () => {
 
   const getProfileFromLocal = () => {
     try {
-      const profileData = localStorage.getItem('userProfile');
+      const profileData = localStorage.getItem('user');
       if (profileData) {
         return JSON.parse(profileData);
       }

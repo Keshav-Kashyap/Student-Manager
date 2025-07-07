@@ -63,7 +63,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
     setIsVerifyingSession(true);
 
     try {
-      const response = await fetch(`${API_BASE}/api/users/me`, {
+      const response = await fetch(`${API_BASE}/api/users/profile`, {
         method: 'GET',
         credentials: 'include',
         headers: {

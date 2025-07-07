@@ -167,11 +167,20 @@ const AdminSidebar = ({ isOpen, onClose, className }) => {
             ) : (
               <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4 border border-purple-100">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-white text-sm font-bold">
-                      {getAdminInitials(admin?.name || admin?.firstName)}
-                    </span>
-                  </div>
+                 {admin?.profileImage ? (
+  <img
+    src={admin.profileImage}
+    alt="Admin Profile"
+    className="w-10 h-10 rounded-full object-cover shadow-lg"
+  />
+) : (
+  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+    <span className="text-white text-sm font-bold">
+      {getAdminInitials(admin?.name || admin?.firstName)}
+    </span>
+  </div>
+)}
+
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-gray-800">
                       {admin?.name || `${admin?.firstName || ''} ${admin?.lastName || ''}`.trim() || 'Admin User'}
@@ -190,24 +199,25 @@ const AdminSidebar = ({ isOpen, onClose, className }) => {
                       <span className="text-gray-700 truncate">{admin.email}</span>
                     </div>
                   )}
-                  {admin?.contact && (
+                  {admin?.phone && (
                     <div className="flex items-center gap-2">
                       <span className="text-gray-500 min-w-12">Contact:</span>
-                      <span className="text-gray-700">{admin.contact}</span>
+                      <span className="text-gray-700">{admin.phone}</span>
                     </div>
                   )}
-                  {admin?.department && (
+                    {admin?.emergencyContact && (
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-500 min-w-12">Dept:</span>
-                      <span className="text-gray-700 truncate">{admin.department}</span>
+                      <span className="text-gray-500 min-w-12">Emergency Contact:</span>
+                      <span className="text-gray-700">{admin.emergencyContact}</span>
                     </div>
                   )}
-                  {admin?.collegeName && (
+                     {admin?.designation&& (
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-500 min-w-12">College:</span>
-                      <span className="text-gray-700 truncate">{admin.collegeName}</span>
+                      <span className="text-gray-500 min-w-12">Designation:</span>
+                      <span className="text-gray-700">{admin.designation}</span>
                     </div>
                   )}
+
                 </div>
               </div>
             )}

@@ -1,30 +1,41 @@
 import React from "react";
 import { User } from "lucide-react";
 
-const UserAvatar = ({ user, size = "sm" }) => {
-  const sizeClasses = {
-    sm: "w-8 h-8",
-    md: "w-10 h-10", 
-    lg: "w-12 h-12"
-  };
+// Define size mappings
+const sizeClasses = {
+  sm: "w-10 h-10 text-base",
+  md: "w-14 h-14 text-lg",
+  lg: "w-20 h-20 text-xl",
+};
 
-  const iconSizes = {
-    sm: 16,
-    md: 18,
-    lg: 20
-  };
+const UserAvatar = ({ user, size = "sm" }) => {
+  const localUserString = localStorage.getItem("user");
+  let localUser = null;
+
+  try {
+    localUser = localUserString ? JSON.parse(localUserString) : null;
+    console.log("✅ Parsed local user:", localUser);
+  } catch (e) {
+    console.error("❌ Error parsing local user:", e);
+  }
+
+  const avatarSize = sizeClasses[size] || sizeClasses.sm;
+  const displayLetter =
+    (localUser?.name || localUser?.firstName || "U").charAt(0).toUpperCase();
 
   return (
     <>
-      {user?.profileImage? (
+      {localUser?.profileImage ? (
         <img
-          src={user.profileImage}
+          src={localUser.profileImage}
           alt="User Avatar"
-          className={`${sizeClasses[size]} rounded-full object-cover`}
+          className={`${avatarSize} rounded-full object-cover`}
         />
       ) : (
-        <div className={`${sizeClasses[size]} bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center`}>
-          <User size={iconSizes[size]} className="text-white" />
+        <div
+          className={`${avatarSize} bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg`}
+        >
+          <span className="text-white font-bold">{displayLetter}</span>
         </div>
       )}
     </>

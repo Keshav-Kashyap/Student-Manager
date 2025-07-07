@@ -1,4 +1,5 @@
-// Improved UserManager utilities
+// utils/UserManager.js
+
 export const UserManager = {
   getSavedUser: () => {
     try {
@@ -7,41 +8,27 @@ export const UserManager = {
       }
 
       const savedUser = localStorage.getItem("user");
-      
-      if (!savedUser) {
-        return null;
-      }
+      if (!savedUser) return null;
 
       const userData = JSON.parse(savedUser);
-      
+
       if (!userData || typeof userData !== 'object') {
-        console.warn('Invalid user data format in localStorage');
+        console.warn('Invalid user data in localStorage');
         localStorage.removeItem("user");
         return null;
       }
 
-      if (!userData.id && !userData._id) {
-        console.warn('User data missing required ID field');
+      // Minimal validation
+      if (!userData._id && !userData.id) {
+        console.warn('User data missing ID field');
         localStorage.removeItem("user");
         return null;
-      }
-
-      // Check if user data has required fields
-      if (!userData.role) {
-        console.warn('User data missing role field, user data:', userData);
-        // Don't remove user data immediately, let's see what we have
-        // localStorage.removeItem("user");
-        // return null;
       }
 
       return userData;
-    } catch (error) {
-      console.error('Error accessing localStorage or parsing user data:', error);
-      try {
-        localStorage.removeItem("user");
-      } catch (cleanupError) {
-        console.error('Error cleaning up localStorage:', cleanupError);
-      }
+    } catch (err) {
+      console.error('Error parsing user data from localStorage:', err);
+      localStorage.removeItem("user");
       return null;
     }
   },
@@ -50,20 +37,19 @@ export const UserManager = {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
         if (!userData || typeof userData !== 'object') {
-          console.error('Invalid user data provided to saveUser');
+          console.error('Invalid user data for saveUser');
           return false;
         }
 
         localStorage.setItem("user", JSON.stringify(userData));
-        console.log('User data saved successfully:', userData);
-        
-        // Trigger storage event for cross-component sync
+        console.log('✅ User data saved:', userData);
+
         window.dispatchEvent(new CustomEvent('userDataChanged', { detail: userData }));
         return true;
       }
       return false;
-    } catch (error) {
-      console.error('Error saving user data:', error);
+    } catch (err) {
+      console.error('Error saving user to localStorage:', err);
       return false;
     }
   },
@@ -72,24 +58,21 @@ export const UserManager = {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
         localStorage.removeItem("user");
-        console.log('User data cleared successfully');
-        
-        // Trigger storage event for cross-component sync
+        console.log('🧹 User data cleared');
+
         window.dispatchEvent(new CustomEvent('userDataChanged', { detail: null }));
       }
-    } catch (error) {
-      console.error('Error clearing user data:', error);
+    } catch (err) {
+      console.error('Error clearing localStorage user:', err);
     }
   },
 
-  // New method to check if user is authenticated
   isAuthenticated: () => {
     return UserManager.getSavedUser() !== null;
   },
 
-  // New method to get user role
   getUserRole: () => {
     const user = UserManager.getSavedUser();
-    return user ? user.role : null;
+    return user?.role || null;
   }
 };

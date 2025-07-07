@@ -96,6 +96,11 @@ const AdminPanel = () => {
     if (!name) return 'A';
     return name.split(' ').map(word => word.charAt(0)).join('').toUpperCase().slice(0, 2);
   };
+  useEffect(() => {
+  if (admin !== null) {
+    console.log("✅ Admin data updated:", admin);
+  }
+}, [admin]);
 
   // Get greeting based on time
   const getGreeting = () => {
@@ -119,15 +124,26 @@ const AdminPanel = () => {
               <div className="flex items-center gap-6">
                 {/* Admin Avatar */}
                 <div className="relative">
-                  <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg border border-white/30">
-                    {adminLoading ? (
-                      <div className="w-12 h-12 bg-white/30 rounded-full animate-pulse"></div>
-                    ) : (
-                      <span className="text-white text-2xl font-bold">
-                        {getAdminInitials(admin?.name || admin?.firstName)}
-                      </span>
-                    )}
-                  </div>
+
+                {admin?.profileImage ? (
+  <img
+    src={admin.profileImage}
+    alt="Admin Profile"
+    className="w-20 h-20 rounded-2xl object-cover shadow-lg border border-white/30"
+  />
+) : (
+  <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg border border-white/30">
+    {adminLoading ? (
+      <div className="w-12 h-12 bg-white/30 rounded-full animate-pulse"></div>
+    ) : (
+      <span className="text-white text-2xl font-bold">
+        {getAdminInitials(admin?.name || admin?.firstName)}
+      </span>
+    )}
+  </div>
+)}
+
+
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center shadow-lg">
                     <Shield size={16} className="text-white" />
                   </div>
@@ -152,7 +168,7 @@ const AdminPanel = () => {
                         Welcome back, {admin?.name || `${admin?.firstName || ''} ${admin?.lastName || ''}`.trim() || 'Admin'}
                       </h2>
                       <p className="text-purple-100 text-sm">
-                        {admin?.role || 'Super Administrator'} • {admin?.department || 'System Management'}
+                        {admin?.role || 'Super Administrator'} • { 'System Management'}
                       </p>
                     </div>
                   )}
@@ -202,22 +218,24 @@ const AdminPanel = () => {
                       <p className="text-sm font-medium truncate">{admin.email}</p>
                     </div>
                   )}
-                  {admin?.contact && (
+                  {admin?.phone && (
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                       <p className="text-xs text-purple-100 mb-1">Contact</p>
-                      <p className="text-sm font-medium">{admin.contact}</p>
+                      <p className="text-sm font-medium">{admin.phone}</p>
                     </div>
                   )}
-                  {admin?.department && (
+                  {admin?.emergencyContact && (
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                      <p className="text-xs text-purple-100 mb-1">Department</p>
-                      <p className="text-sm font-medium truncate">{admin.department}</p>
+                      <p className="text-xs text-purple-100 mb-1">Emergency Contact
+</p>
+                      <p className="text-sm font-medium truncate">{admin.emergencyContact
+}</p>
                     </div>
                   )}
-                  {admin?.collegeName && (
+                  {admin?.designation && (
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                      <p className="text-xs text-purple-100 mb-1">College</p>
-                      <p className="text-sm font-medium truncate">{admin.collegeName}</p>
+                      <p className="text-xs text-purple-100 mb-1">Designation</p>
+                      <p className="text-sm font-medium truncate">{admin.designation}</p>
                     </div>
                   )}
                 </div>

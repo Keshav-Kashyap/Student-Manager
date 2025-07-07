@@ -53,15 +53,40 @@ const GoogleRedirect = () => {
           return;
         }
 
+        const fetchUserProfile = async () => {
+  try {
+    const res = await fetch('/api/users/profile', {
+      method: 'GET',
+      credentials: 'include', // if using cookies for auth
+      headers: {
+        'Content-Type': 'application/json',
+        // If you're using token from localStorage instead of cookies:
+        // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch user profile');
+    }
+
+    const user = await res.json();
+    return user;
+  } catch (err) {
+    console.error('Error fetching user profile:', err.message);
+    return null;
+  }
+};
         // ✅ Get user data from server
-        const user = await authAPI.refreshUser();
+ const result = await fetchUserProfile();
 
-        if (user) {
-          const userRole = user.role;
-          const hasProfile = user.hasProfile;
-
-          console.log("✅ Google auth user data:", user);
-          toast.success('Google authentication successful!');
+       
+if (result && result.success) {
+  const user = result.data; // ✅ This is actual user object
+  const userRole = user.role;
+  const hasProfile = user.hasProfile;
+  console.log("Your user data:",user);
+  
+  toast.success('Google authentication successful!');
 
           if (userRole === 'admin') {
             navigate('/admin/dashboard');
