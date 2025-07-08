@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { authAPI } from '../../services/api';
-
+import { API_BASE } from '../../config/api';
 const GoogleRedirect = () => {
   const navigate = useNavigate();
 
@@ -55,7 +55,7 @@ const GoogleRedirect = () => {
 
         const fetchUserProfile = async () => {
   try {
-    const res = await fetch('/api/users/profile', {
+    const res = await fetch(`${API_BASE}/api/users/profile`, {
       method: 'GET',
       credentials: 'include', // if using cookies for auth
       headers: {
