@@ -66,8 +66,9 @@ app.use(session({
   saveUninitialized: false, // ✅ safer & recommended
   secret: process.env.SESSION_SECRET,
   cookie: {
-    secure: false, // ❌ change to true in production with https
+    secure: true, // ❌ change to true in production with https
     httpOnly: true,
+        sameSite: 'none',          
     maxAge: 1000 * 60 * 60 * 24 // 1 day
   }
 }));
