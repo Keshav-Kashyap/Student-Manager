@@ -19,7 +19,7 @@ export const useFormData = (profile, profileLoading, isCreateMode) => {
   });
 
   const [profileImage, setProfileImage] = useState(
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
+    'https://icon-library.com/images/user-icon-jpg/user-icon-jpg-5.jpg'
   );
 
   // Initialize form data when profile data is available
