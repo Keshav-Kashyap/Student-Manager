@@ -31,7 +31,7 @@ const AdminPanel = () => {
   const [viewMode, setViewMode] = useState('list');
   const [admin, setAdmin] = useState(null);
   const [adminLoading, setAdminLoading] = useState(true);
-  
+
   const { loading, error, analytics, totalStudents } = useAdminAnalytics();
   const cardConfigs = getCardConfigs(analytics, totalStudents);
 
@@ -97,10 +97,10 @@ const AdminPanel = () => {
     return name.split(' ').map(word => word.charAt(0)).join('').toUpperCase().slice(0, 2);
   };
   useEffect(() => {
-  if (admin !== null) {
-    console.log("✅ Admin data updated:", admin);
-  }
-}, [admin]);
+    if (admin !== null) {
+      console.log("✅ Admin data updated:", admin);
+    }
+  }, [admin]);
 
   // Get greeting based on time
   const getGreeting = () => {
@@ -125,23 +125,23 @@ const AdminPanel = () => {
                 {/* Admin Avatar */}
                 <div className="relative">
 
-                {admin?.profileImage ? (
-  <img
-    src={admin.profileImage}
-    alt="Admin Profile"
-    className="w-20 h-20 rounded-2xl object-cover shadow-lg border border-white/30"
-  />
-) : (
-  <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg border border-white/30">
-    {adminLoading ? (
-      <div className="w-12 h-12 bg-white/30 rounded-full animate-pulse"></div>
-    ) : (
-      <span className="text-white text-2xl font-bold">
-        {getAdminInitials(admin?.name || admin?.firstName)}
-      </span>
-    )}
-  </div>
-)}
+                  {admin?.profileImage ? (
+                    <img
+                      src={admin.profileImage}
+                      alt="Admin Profile"
+                      className="w-20 h-20 rounded-2xl object-cover shadow-lg border border-white/30"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg border border-white/30">
+                      {adminLoading ? (
+                        <div className="w-12 h-12 bg-white/30 rounded-full animate-pulse"></div>
+                      ) : (
+                        <span className="text-white text-2xl font-bold">
+                          {getAdminInitials(admin?.name || admin?.firstName)}
+                        </span>
+                      )}
+                    </div>
+                  )}
 
 
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center shadow-lg">
@@ -168,7 +168,7 @@ const AdminPanel = () => {
                         Welcome back, {admin?.name || `${admin?.firstName || ''} ${admin?.lastName || ''}`.trim() || 'Admin'}
                       </h2>
                       <p className="text-purple-100 text-sm">
-                        {admin?.role || 'Super Administrator'} • { 'System Management'}
+                        {admin?.role || 'Super Administrator'} • {'System Management'}
                       </p>
                     </div>
                   )}
@@ -183,16 +183,16 @@ const AdminPanel = () => {
                     <div>
                       <p className="text-xs text-purple-100">Today</p>
                       <p className="font-semibold">
-                        {new Date().toLocaleDateString('en-US', { 
-                          weekday: 'short', 
-                          month: 'short', 
-                          day: 'numeric' 
+                        {new Date().toLocaleDateString('en-US', {
+                          weekday: 'short',
+                          month: 'short',
+                          day: 'numeric'
                         })}
                       </p>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                   <div className="flex items-center gap-2 text-white">
                     <Activity size={18} />
@@ -227,15 +227,15 @@ const AdminPanel = () => {
                   {admin?.emergencyContact && (
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                       <p className="text-xs text-purple-100 mb-1">Emergency Contact
-</p>
+                      </p>
                       <p className="text-sm font-medium truncate">{admin.emergencyContact
-}</p>
+                      }</p>
                     </div>
                   )}
-                  {admin?.designation && (
+                  {admin?.address && (
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                      <p className="text-xs text-purple-100 mb-1">Designation</p>
-                      <p className="text-sm font-medium truncate">{admin.designation}</p>
+                      <p className="text-xs text-purple-100 mb-1">address</p>
+                      <p className="text-sm font-medium truncate">{admin.address}</p>
                     </div>
                   )}
                 </div>
@@ -244,7 +244,7 @@ const AdminPanel = () => {
           </div>
 
           {/* Quick Actions */}
-        
+
 
           {/* Modern Analytics Cards */}
           <div>
@@ -252,19 +252,19 @@ const AdminPanel = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {loading
                 ? cardConfigs.map((card, index) => (
-                    <ModernStatCardSkeleton key={index} color={card.color} />
-                  ))
+                  <ModernStatCardSkeleton key={index} color={card.color} />
+                ))
                 : cardConfigs.map((card, index) => (
-                    <ModernStatCard
-                      key={index}
-                      title={card.title}
-                      value={card.value}
-                      icon={card.icon}
-                      trend={card.trend}
-                      color={card.color}
-                      subtitle={card.subtitle}
-                    />
-                  ))}
+                  <ModernStatCard
+                    key={index}
+                    title={card.title}
+                    value={card.value}
+                    icon={card.icon}
+                    trend={card.trend}
+                    color={card.color}
+                    subtitle={card.subtitle}
+                  />
+                ))}
             </div>
           </div>
         </div>
@@ -282,14 +282,14 @@ const AdminPanel = () => {
               Back to Dashboard
             </button>
           </div>
-          
+
           {selectedUser ? (
-            <UserDetailsView 
-              user={selectedUser} 
-              onBack={() => setSelectedUser(null)} 
+            <UserDetailsView
+              user={selectedUser}
+              onBack={() => setSelectedUser(null)}
             />
           ) : (
-            <UserTable 
+            <UserTable
               onUserSelect={setSelectedUser}
               viewMode={viewMode}
               onViewModeChange={setViewMode}

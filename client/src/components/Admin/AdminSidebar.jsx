@@ -20,7 +20,7 @@ const AdminSidebar = ({ isOpen, onClose, className }) => {
       name: "User Management",
       href: "/users",
       icon: Users,
-     
+
     },
   ];
 
@@ -94,7 +94,7 @@ const AdminSidebar = ({ isOpen, onClose, className }) => {
     <>
       {/* Overlay for mobile */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
           onClick={onClose}
         />
@@ -111,7 +111,7 @@ const AdminSidebar = ({ isOpen, onClose, className }) => {
         ${className}
       `}>
         <div className="p-6 h-full flex flex-col overflow-y-auto">
-          
+
           {/* Close Button for Mobile */}
           <div className="lg:hidden flex justify-end mb-4">
             <button
@@ -134,7 +134,7 @@ const AdminSidebar = ({ isOpen, onClose, className }) => {
               </div>
             </div>
           </div>
-          
+
           {/* Menu Items */}
           <div className="flex-1">
             <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-4">
@@ -167,19 +167,19 @@ const AdminSidebar = ({ isOpen, onClose, className }) => {
             ) : (
               <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4 border border-purple-100">
                 <div className="flex items-center gap-3 mb-3">
-                 {admin?.profileImage ? (
-  <img
-    src={admin.profileImage}
-    alt="Admin Profile"
-    className="w-10 h-10 rounded-full object-cover shadow-lg"
-  />
-) : (
-  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-    <span className="text-white text-sm font-bold">
-      {getAdminInitials(admin?.name || admin?.firstName)}
-    </span>
-  </div>
-)}
+                  {admin?.profileImage ? (
+                    <img
+                      src={admin.profileImage}
+                      alt="Admin Profile"
+                      className="w-10 h-10 rounded-full object-cover shadow-lg"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                      <span className="text-white text-sm font-bold">
+                        {getAdminInitials(admin?.name || admin?.firstName)}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-gray-800">
@@ -190,7 +190,7 @@ const AdminSidebar = ({ isOpen, onClose, className }) => {
                     </p>
                   </div>
                 </div>
-                
+
                 {/* Admin Details */}
                 <div className="space-y-2 text-xs">
                   {admin?.email && (
@@ -205,16 +205,16 @@ const AdminSidebar = ({ isOpen, onClose, className }) => {
                       <span className="text-gray-700">{admin.phone}</span>
                     </div>
                   )}
-                    {admin?.emergencyContact && (
+                  {admin?.emergencyContact && (
                     <div className="flex items-center gap-2">
                       <span className="text-gray-500 min-w-12">Emergency Contact:</span>
                       <span className="text-gray-700">{admin.emergencyContact}</span>
                     </div>
                   )}
-                     {admin?.designation&& (
+                  {admin?.address && (
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-500 min-w-12">Designation:</span>
-                      <span className="text-gray-700">{admin.designation}</span>
+                      <span className="text-gray-500 min-w-12">Address:</span>
+                      <span className="text-gray-700">{admin.address}</span>
                     </div>
                   )}
 
