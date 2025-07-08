@@ -23,16 +23,20 @@ const SocialAuth = ({ onGoogleAuth, onFacebookAuth, showDivider = true }) => {
       </div>
 
       {/* Divider */}
-      {showDivider && (
-        <div className="relative mb-8">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-600"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-transparent text-gray-400 font-medium">Or continue with email</span>
-          </div>
-        </div>
-      )}
+      {/* Divider */}
+{showDivider && (
+  <div className="relative mb-8">
+    <div className="absolute inset-0 flex items-center">
+      <div className="w-full border-t border-gray-600"></div>
+    </div>
+    <div className="relative flex justify-center text-sm">
+      <span className="px-4 bg-[#0f172a] text-gray-400 font-medium">
+        Or continue with email
+      </span>
+    </div>
+  </div>
+)}
+
     </>
   );
 };
