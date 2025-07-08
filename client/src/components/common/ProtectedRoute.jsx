@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { UserManager } from '../../Utils/UserManager';
-
+import { API_BASE } from '../../config/api';
 const ProtectedRoute = ({ allowedRoles }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -10,7 +10,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
   // ✅ Always check session from backend first
   const fetchUserSession = async () => {
     try {
-      const res = await fetch('/api/users/profile', {
+      const res = await fetch(`${API_BASE}/api/users/profile`, {
         method: 'GET',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
