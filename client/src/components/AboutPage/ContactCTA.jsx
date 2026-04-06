@@ -17,7 +17,7 @@ const ContactCTA = () => {
           </button>
         </div>
         <div className="mt-8 text-purple-200">
-          <p>📍 Main Chouraaha, Koharanwali Gali, Nirjhari (Purvi)</p>
+          <p> Main Chouraaha, Koharanwali Gali, Nirjhari (Purvi)</p>
         </div>
       </div>
     </section>

@@ -14,7 +14,7 @@ const useProfile = () => {
         return JSON.parse(profileData);
       }
     } catch (error) {
-      console.error("❌ Error parsing profile data:", error);
+      console.error(" Error parsing profile data:", error);
     }
     return null;
   };
@@ -41,23 +41,23 @@ const useProfile = () => {
       }
 
       const profileData = await res.json();
-      console.log("✅ Profile data fetched:", profileData);
-      
+      console.log(" Profile data fetched:", profileData);
+
       // Store complete profile data
       const completeProfile = {
         ...profileData,
         isAuthenticated: true,
         lastSync: new Date().toISOString()
       };
-      
+
       localStorage.setItem('userProfile', JSON.stringify(completeProfile));
       localStorage.setItem('user', JSON.stringify(completeProfile)); // For backward compatibility
       setProfile(completeProfile);
       setError(null);
     } catch (err) {
-      console.error("❌ Error fetching profile:", err);
+      console.error(" Error fetching profile:", err);
       setError(err.message);
-      
+
       // Fallback to local data
       const fallbackProfile = getProfileFromLocal();
       if (fallbackProfile) {
@@ -89,13 +89,13 @@ const useProfile = () => {
       }
 
       const result = await res.json();
-      console.log("✅ Profile created:", result);
-      
+      console.log(" Profile created:", result);
+
       // Refresh profile data after creation
       await fetchUserProfile();
       return result;
     } catch (err) {
-      console.error("❌ Error creating profile:", err);
+      console.error(" Error creating profile:", err);
       setError(err.message);
       throw err;
     } finally {
@@ -124,13 +124,13 @@ const useProfile = () => {
       }
 
       const result = await res.json();
-      console.log("✅ Profile updated:", result);
-      
+      console.log(" Profile updated:", result);
+
       // Refresh profile data after update
       await fetchUserProfile();
       return result;
     } catch (err) {
-      console.error("❌ Error updating profile:", err);
+      console.error(" Error updating profile:", err);
       setError(err.message);
       throw err;
     } finally {
@@ -150,15 +150,15 @@ const useProfile = () => {
     if (localProfile) {
       setProfile(localProfile);
     }
-    
+
     // Then fetch fresh data from API
     fetchUserProfile();
   }, []);
 
-  return { 
-    profile, 
-    loading, 
-    error, 
+  return {
+    profile,
+    loading,
+    error,
     refreshProfile: fetchUserProfile,
     createProfile,
     updateProfile,

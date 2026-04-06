@@ -98,7 +98,7 @@ const AdminPanel = () => {
   };
   useEffect(() => {
     if (admin !== null) {
-      console.log("✅ Admin data updated:", admin);
+      console.log(" Admin data updated:", admin);
     }
   }, [admin]);
 

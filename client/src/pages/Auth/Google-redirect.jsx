@@ -29,9 +29,9 @@ const GoogleRedirect = () => {
 
         if (error) {
           const errorMessage = decodeURIComponent(error);
-          console.log("❌ Error message:", errorMessage);
+          console.log(" Error message:", errorMessage);
 
-          // ✅ Check if it's a "no account found" error from login
+          //  Check if it's a "no account found" error from login
           if (errorMessage.includes('No account found') && action === 'signup') {
             toast.error('No account found with this Google email. Please sign up first.');
             navigate('/signup', {
@@ -54,39 +54,39 @@ const GoogleRedirect = () => {
         }
 
         const fetchUserProfile = async () => {
-  try {
-    const res = await fetch(`${API_BASE}/api/users/profile`, {
-      method: 'GET',
-      credentials: 'include', // if using cookies for auth
-      headers: {
-        'Content-Type': 'application/json',
-        // If you're using token from localStorage instead of cookies:
-        // 'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-    });
+          try {
+            const res = await fetch(`${API_BASE}/api/users/profile`, {
+              method: 'GET',
+              credentials: 'include', // if using cookies for auth
+              headers: {
+                'Content-Type': 'application/json',
+                // If you're using token from localStorage instead of cookies:
+                // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+              },
+            });
 
-    if (!res.ok) {
-      throw new Error('Failed to fetch user profile');
-    }
+            if (!res.ok) {
+              throw new Error('Failed to fetch user profile');
+            }
 
-    const user = await res.json();
-    return user;
-  } catch (err) {
-    console.error('Error fetching user profile:', err.message);
-    return null;
-  }
-};
-        // ✅ Get user data from server
- const result = await fetchUserProfile();
+            const user = await res.json();
+            return user;
+          } catch (err) {
+            console.error('Error fetching user profile:', err.message);
+            return null;
+          }
+        };
+        //  Get user data from server
+        const result = await fetchUserProfile();
 
-       
-if (result && result.success) {
-  const user = result.data; // ✅ This is actual user object
-  const userRole = user.role;
-  const hasProfile = user.hasProfile;
-  console.log("Your user data:",user);
-  
-  toast.success('Google authentication successful!');
+
+        if (result && result.success) {
+          const user = result.data; //  This is actual user object
+          const userRole = user.role;
+          const hasProfile = user.hasProfile;
+          console.log("Your user data:", user);
+
+          toast.success('Google authentication successful!');
 
           if (userRole === 'admin') {
             navigate('/admin/dashboard');
@@ -106,7 +106,7 @@ if (result && result.success) {
         }
 
       } catch (error) {
-        console.error('❌ Error during Google auth redirect:', error);
+        console.error(' Error during Google auth redirect:', error);
         toast.error('Authentication failed. Please try again.');
         navigate('/login');
       }

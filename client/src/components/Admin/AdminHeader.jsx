@@ -2,7 +2,7 @@
 import React from 'react';
 import { Bell, Settings, LogOut, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { logoutUser } from '../../Utils/auth'; // ✅ Import utility
+import { logoutUser } from '../../Utils/auth'; //  Import utility
 import UserAvatar from '../Navbar/UserAvatar';
 
 const AdminHeader = () => {
@@ -10,7 +10,7 @@ const AdminHeader = () => {
 
   const handleLogout = (e) => {
     e.preventDefault();
-    logoutUser(navigate); // ✅ Use the utility function
+    logoutUser(navigate); //  Use the utility function
   };
 
   return (
@@ -28,15 +28,12 @@ const AdminHeader = () => {
               <p className="text-gray-600 font-medium">Admin Dashboard</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             {/* Notification Button */}
-      
-            
-      
-            
+
             {/* Logout Button */}
-            <button 
+            <button
               onClick={handleLogout}
               className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-xl transition-all font-medium hover:shadow-md"
             >

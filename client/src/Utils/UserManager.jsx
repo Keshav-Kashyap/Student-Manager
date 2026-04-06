@@ -42,7 +42,7 @@ export const UserManager = {
         }
 
         localStorage.setItem("user", JSON.stringify(userData));
-        console.log('✅ User data saved:', userData);
+        console.log(' User data saved:', userData);
 
         window.dispatchEvent(new CustomEvent('userDataChanged', { detail: userData }));
         return true;

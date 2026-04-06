@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Printer, BarChart3 } from 'lucide-react';
-import { API_BASE } from '../config/api';
+import { Users, Printer, BarChart3, RefreshCw } from 'lucide-react';
 // Components
 import StatCard from '../components/StatCard';
 import UserWelcomeSection from '../components/dashboard/UserWelcomeSection';
 import ProfileCompletionAlert from '../components/dashboard/ProfileCompletionAlert';
 import UserProfileCard from '../components/dashboard/UserProfileCard';
 import PrintStatsService from '../Utils/printStatsService';
-
-
-
 // Hooks
 import useStudents from '../Hooks/useStudent';
+import useUser from '../Hooks/useUser';
 
 // Print Statistics Service
 
@@ -21,39 +18,15 @@ const Dashboard = () => {
     students: 0,
     printedId: 0
   });
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
 
-  const { students, loading: studentsLoading, fetchStudents } = useStudents();
+  const { students, loading: studentsLoading } = useStudents();
+  const { user, loading: userLoading } = useUser();
 
-  useEffect(() => {
-    fetchStudents();
-  }, []);
-
-  useEffect(() => {
-  const updateStats = async () => {
-    if (!studentsLoading && students) {
-      const printStats = await PrintStatsService.getFormattedStats(); // ✅ await here
-
-      setStats(prevStats => ({
-        ...prevStats,
-        students: students.length,
-        printedId: printStats.total
-      }));
-
-      setLoading(false);
-    }
-  };
-
-  updateStats();
-}, [students, studentsLoading]);
-
-  // Fetch dashboard data
-  const fetchDashboardData = async () => {
+  // Refresh stats manually instead of polling
+  const refreshStats = async () => {
     try {
-    
-
-      const printStats = await PrintStatsService.getFormattedStats(); // ✅ Use API-based stats
+      const printStats = await PrintStatsService.getFormattedStats();
 
       setStats(prev => ({
         ...prev,
@@ -67,106 +40,70 @@ const Dashboard = () => {
         printedId: 0
       }));
     } finally {
-      setLoading(false);
+      setStatsLoading(false);
     }
-  };
-
-  // Get user data from localStorage
-  const getUserData = () => {
-    try {
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-        return parsedUser;
-      }
-    } catch (error) {
-      console.error('Error parsing user data:', error);
-    }
-    return null;
-  };
-
-  // Fetch user profile from backend
-  const fetchUserProfile = async () => {
-    try {
-   
-
-      const response = await fetch(`${API_BASE}/api/profile/me`, {
-        method: 'GET',
-         credentials: 'include',
-        headers: {
-        
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-
-        const updatedUserData = {
-          ...userData,
-          isAuthenticated: true,
-          lastFetch: new Date().toISOString()
-        };
-
-        localStorage.setItem('user', JSON.stringify(updatedUserData));
-        setUser(updatedUserData);
-      } else {
-        console.error('Failed to fetch user profile');
-        getUserData();
-      }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      getUserData();
-    }
-  };
-
-  // Refresh stats function (to update print count in real-time)
-  const refreshStats = async () => {
-    const printStats = await PrintStatsService.getFormattedStats();
-    setStats(prev => ({
-      ...prev,
-      printedId: printStats.total
-    }));
   };
 
   useEffect(() => {
-    const localUser = getUserData();
-    fetchUserProfile();
-    fetchDashboardData();
+    if (!studentsLoading && students) {
+      refreshStats();
+    }
+  }, [students, studentsLoading]);
 
-    // Refresh stats every 30 seconds to catch any print updates
-    const interval = setInterval(refreshStats, 30000);
+  // Manual refresh only; no background polling
+  const handleRefreshStats = async () => {
+    try {
+      setStatsLoading(true);
+      const printStats = await PrintStatsService.getFormattedStats();
 
-    return () => clearInterval(interval);
-  }, []);
+      setStats(prev => ({
+        ...prev,
+        students: students.length,
+        printedId: printStats.total
+      }));
+    } finally {
+      setStatsLoading(false);
+    }
+  };
 
   const statsCards = [
     {
-      title: "Students",
-      value: loading ? "..." : stats.students.toString(),
+      title: 'Students',
+      value: studentsLoading ? '...' : stats.students.toString(),
       icon: Users
     },
     {
-      title: "Printed ID Cards",
-      value: loading ? "..." : stats.printedId.toString(),
+      title: 'Printed ID Cards',
+      value: statsLoading ? '...' : stats.printedId.toString(),
       icon: Printer
     }
   ];
 
   // Check if profile is complete
   const isProfileComplete = user && user.collegeName && user.department;
+  const isPageLoading = userLoading || studentsLoading || statsLoading;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="h-full w-full p-6 rounded-xl bg-blue-50 overflow-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-extrabold text-indigo-900 flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-              <BarChart3 size={28} className="text-white" />
-            </div>
-            Dashboard
-          </h1>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <h1 className="text-4xl font-extrabold text-indigo-900 flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                <BarChart3 size={28} className="text-white" />
+              </div>
+              Dashboard
+            </h1>
+
+            <button
+              type="button"
+              onClick={handleRefreshStats}
+              className="inline-flex items-center gap-2 self-start rounded-lg border border-indigo-200 bg-white px-4 py-2 text-sm font-semibold text-indigo-700 shadow-sm transition-colors hover:bg-indigo-50"
+            >
+              <RefreshCw size={16} className={statsLoading ? 'animate-spin' : ''} />
+              Refresh stats
+            </button>
+          </div>
 
           {/* User Welcome Section */}
           <UserWelcomeSection user={user} isProfileComplete={isProfileComplete} />
@@ -189,6 +126,10 @@ const Dashboard = () => {
 
         {/* User Profile Card */}
         <UserProfileCard user={user} />
+
+        {isPageLoading && (
+          <p className="mt-4 text-sm text-slate-500">Loading dashboard data...</p>
+        )}
       </div>
     </div>
   );

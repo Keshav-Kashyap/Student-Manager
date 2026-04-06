@@ -86,72 +86,72 @@ const AddStudentPage = () => {
     const submitData = new FormData();
 
 
-  
-// Name
-if (!formData.name.trim()) {
-  newErrors.name = 'Name is required';
-} else if (formData.name.trim().length < 3) {
-  newErrors.name = 'Name must be at least 3 characters';
-} else if (formData.name.trim().length > 50) {
-  newErrors.name = 'Name must be at most 50 characters';
-}
 
-// Father's name
-if (!formData.fatherName.trim()) {
-  newErrors.fatherName = "Father's name is required";
-} else if (formData.fatherName.trim().length < 3) {
-  newErrors.fatherName = "Father's name must be at least 3 characters";
-} else if (formData.fatherName.trim().length > 50) {
-  newErrors.fatherName = "Father's name must be at most 50 characters";
-}
+    // Name
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (formData.name.trim().length < 3) {
+      newErrors.name = 'Name must be at least 3 characters';
+    } else if (formData.name.trim().length > 50) {
+      newErrors.name = 'Name must be at most 50 characters';
+    }
 
-// Mother's name
-if (!formData.motherName.trim()) {
-  newErrors.motherName = "Mother's name is required";
-}
-else if(formData.motherName.trim().length < 3) {
-    newErrors.motherName = "Mother's name must be at least 3 characters";
-  } else if (formData.motherName.trim().length > 50) {
-    newErrors.motherName = "Mother's name must be at most 50 characters";
-  }
+    // Father's name
+    if (!formData.fatherName.trim()) {
+      newErrors.fatherName = "Father's name is required";
+    } else if (formData.fatherName.trim().length < 3) {
+      newErrors.fatherName = "Father's name must be at least 3 characters";
+    } else if (formData.fatherName.trim().length > 50) {
+      newErrors.fatherName = "Father's name must be at most 50 characters";
+    }
+
+    // Mother's name
+    if (!formData.motherName.trim()) {
+      newErrors.motherName = "Mother's name is required";
+    }
+    else if (formData.motherName.trim().length < 3) {
+      newErrors.motherName = "Mother's name must be at least 3 characters";
+    } else if (formData.motherName.trim().length > 50) {
+      newErrors.motherName = "Mother's name must be at most 50 characters";
+    }
 
 
-// Phone number
-if (!formData.phone.trim()) {
-  newErrors.phone = 'Phone number is required';
-} else if (!/^\d{10}$/.test(formData.phone.trim())) {
-  newErrors.phone = 'Phone number must be exactly 10 digits';
-}
+    // Phone number
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^\d{10}$/.test(formData.phone.trim())) {
+      newErrors.phone = 'Phone number must be exactly 10 digits';
+    }
 
-// Class
-if (!formData.class.trim()) {
-  newErrors.class = 'Class is required';
-} else if (formData.class.trim().length > 20) {
-  newErrors.class = 'Class must be at most 20 characters';
-}
+    // Class
+    if (!formData.class.trim()) {
+      newErrors.class = 'Class is required';
+    } else if (formData.class.trim().length > 20) {
+      newErrors.class = 'Class must be at most 20 characters';
+    }
 
-// Address
-if (!formData.address.trim()) {
-  newErrors.address = 'Address is required';
-} else if (formData.address.trim().length < 3) {
-  newErrors.address = 'Address must be at least 3 characters';
-} else if (formData.address.trim().length > 200) {
-  newErrors.address = 'Address must be at most 200 characters';
-}
+    // Address
+    if (!formData.address.trim()) {
+      newErrors.address = 'Address is required';
+    } else if (formData.address.trim().length < 3) {
+      newErrors.address = 'Address must be at least 3 characters';
+    } else if (formData.address.trim().length > 200) {
+      newErrors.address = 'Address must be at most 200 characters';
+    }
 
-// DOB
-if (!formData.dateOfBirth.trim()) {
-  newErrors.dateOfBirth = 'Date of Birth is required';
-}
+    // DOB
+    if (!formData.dateOfBirth.trim()) {
+      newErrors.dateOfBirth = 'Date of Birth is required';
+    }
 
     if (Object.keys(newErrors).length > 0) {
-    setErrors(newErrors);
-    toast.error('Please fix the highlighted errors');
-    setLoading(false);
-    return;
-  }
+      setErrors(newErrors);
+      toast.error('Please fix the highlighted errors');
+      setLoading(false);
+      return;
+    }
 
-    setErrors({}); // ✅ Clear previous errors if all good
+    setErrors({}); //  Clear previous errors if all good
 
     // Add all form fields to FormData - matching backend controller field names
     submitData.append('name', formData.name);
@@ -169,25 +169,25 @@ if (!formData.dateOfBirth.trim()) {
     }
 
     try {
-    const response = await fetch(`${API_BASE}/api/students`, {
+      const response = await fetch(`${API_BASE}/api/students`, {
 
         method: "POST",
-       credentials: 'include',
+        credentials: 'include',
         body: submitData,
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        toast.success("✅ Student saved successfully!");
+        toast.success(" Student saved successfully!");
         handleClear();
       } else {
-        toast.error(result.message || "❌ Failed to save student.");
+        toast.error(result.message || " Failed to save student.");
         console.error('Server error:', result);
       }
     } catch (error) {
       console.error("Submit Error:", error);
-      toast.error("❌ Something went wrong while submitting the form.");
+      toast.error(" Something went wrong while submitting the form.");
     } finally {
       setLoading(false); // End loading
     }

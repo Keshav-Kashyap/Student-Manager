@@ -1,145 +1,35 @@
-// App.js
-import React, { useState, useEffect } from "react";
-import { Routes, Route, Outlet, Navigate, useNavigate } from "react-router-dom";
-import Navbar from "./components/Navbar/Navbar";
-import Sidebar from "./components/Sidebar";
-import Dashboard from "./pages/Dashboard";
-import StudentList from "./pages/StudentList";
-import PrintIDCard from "./pages/PrintIDCard";
-import AddStudentPage from "./pages/AddStudentPage";
-import EditStudentPage from "./pages/EditStudentPage";
-import Help from "./pages/Help";
-import Login from "./pages/Auth/Login";
-import Signup from "./pages/Auth/Signup";
-import MobileNavigation from "./components/MobileNavigation";
-import { Toaster } from 'react-hot-toast';
+import React, { Suspense, lazy } from "react";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import FlashMessageProvider from "./components/common/FlashMessageProvider";
-import { ConfirmDialogProvider } from './context/ConfirmDialogContext';
-import LandingPage from "./pages/LandingPage";
-import About from "./pages/About";
-import EditProfile from "./pages/EditProfile";
-import PageNotFound from "./pages/page404";
-import ViewStudentIDCardPage from "./pages/ViewStudent";
-import GoogleRedirect from "./pages/Auth/Google-redirect";
-import Admindashboard from "./pages/Admindashboard"
-import UserManagement from "./pages/UserManagement";
-import UserDetailedPage from "./pages/UserDetailedPage";
-import AdminViewStudent from "./pages/AdminViewStudent";
-import AdminLayout from "./Layouts/AdminLayout";
-import SurajPrintingLoader from './components/common/loader'
-import VerifyEmailPage from './pages/Auth/EmailConfirmation'
-import ForgotPassword from "./pages/Auth/ForgotPassword";
-import ResetPassword from "./pages/Auth/ResetPassword";
+import LazyFallback from "./components/common/LazyFallback";
 import ProtectedRoute from "./components/common/ProtectedRoute";
+import { ConfirmDialogProvider } from "./context/ConfirmDialogContext";
+import AdminLayout from "./Layouts/AdminLayout";
+import AuthenticatedLayout from "./Layouts/AuthenticatedLayout";
 import { UserManager } from "./Utils/UserManager";
 
-
-
-const AuthenticatedLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
-  // Load user data and set up listeners
-  useEffect(() => {
-    const loadUserData = () => {
-      try {
-        const savedUser = UserManager.getSavedUser();
-        if (savedUser) {
-          setUser(savedUser);
-        } else {
-          setUser(null);
-          navigate("/login", { replace: true });
-        }
-      } catch (error) {
-        console.error('Error loading user data:', error);
-        UserManager.clearUser();
-        navigate("/login", { replace: true });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadUserData();
-
-    // Listen for user data changes
-    const handleUserDataChange = (event) => {
-      const userData = event.detail;
-      if (userData) {
-        setUser(userData);
-      } else {
-        setUser(null);
-        navigate("/login", { replace: true });
-      }
-    };
-
-    // Listen for localStorage changes (cross-tab sync)
-    const handleStorageChange = (e) => {
-      if (e.key === 'user') {
-        loadUserData();
-      }
-    };
-
-    window.addEventListener('userDataChanged', handleUserDataChange);
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('userDataChanged', handleUserDataChange);
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [navigate]);
-
-  // Sidebar togglers
-  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
-  const closeSidebar = () => setIsSidebarOpen(false);
-
-  // Close sidebar on mobile resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        closeSidebar();
-      }
-    };
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
-    }
-  }, []);
-
-  if (loading) {
-    return (
-      <SurajPrintingLoader title="Loading..." />
-    );
-  }
-
-  return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <Navbar user={user} />
-
-      <div className="flex flex-1 overflow-hidden pt-16">
-        {/* Overlay for mobile */}
-        {isSidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-            onClick={closeSidebar}
-          />
-        )}
-
-        <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} className="h-[calc(100vh-64px)]" user={user} />
-
-        <main
-          className={`flex-1 p-0 overflow-auto transition-all duration-300 ease-in-out ${isSidebarOpen ? "lg:ml-80" : "lg:ml-0"
-            }`}
-        >
-          <Outlet context={{ user, setUser: UserManager.saveUser, clearUser: UserManager.clearUser }} />
-          <MobileNavigation />
-        </main>
-      </div>
-    </div>
-  );
-};
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const Login = lazy(() => import("./pages/Auth/Login"));
+const Signup = lazy(() => import("./pages/Auth/Signup"));
+const Help = lazy(() => import("./pages/Help"));
+const About = lazy(() => import("./pages/About"));
+const GoogleRedirect = lazy(() => import("./pages/Auth/Google-redirect"));
+const VerifyEmailPage = lazy(() => import("./pages/Auth/EmailConfirmation"));
+const ForgotPassword = lazy(() => import("./pages/Auth/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/Auth/ResetPassword"));
+const EditProfile = lazy(() => import("./pages/EditProfile"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const StudentList = lazy(() => import("./pages/StudentList"));
+const AddStudentPage = lazy(() => import("./pages/AddStudentPage"));
+const EditStudentPage = lazy(() => import("./pages/EditStudentPage"));
+const ViewStudentIDCardPage = lazy(() => import("./pages/ViewStudent"));
+const PrintIDCard = lazy(() => import("./pages/PrintIDCard"));
+const Admindashboard = lazy(() => import("./pages/Admindashboard"));
+const UserManagement = lazy(() => import("./pages/UserManagement"));
+const UserDetailedPage = lazy(() => import("./pages/UserDetailedPage"));
+const AdminViewStudent = lazy(() => import("./pages/AdminViewStudent"));
+const PageNotFound = lazy(() => import("./pages/page404"));
+const Chat = lazy(() => import("./pages/Chat"));
 
 // Helper component to check if user is logged in and route accordingly
 const ConditionalRoute = ({ component: Component, authPath }) => {
@@ -149,7 +39,22 @@ const ConditionalRoute = ({ component: Component, authPath }) => {
     return <Navigate to={authPath} replace />;
   }
 
-  return <Component />;
+  return (
+    <Suspense fallback={<LazyFallback title="Loading Page..." />}>
+      {React.createElement(Component)}
+    </Suspense>
+  );
+};
+
+const LazyElement = ({ component: Component, title }) => (
+  <Suspense fallback={<LazyFallback title={title} />}>
+    {React.createElement(Component)}
+  </Suspense>
+);
+
+const EditStudentLegacyRedirect = () => {
+  const { id } = useParams();
+  return <Navigate to={`/app/students/edit/${id}`} replace />;
 };
 
 function App() {
@@ -159,18 +64,30 @@ function App() {
       <ConfirmDialogProvider>
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/" element={<LazyElement component={LandingPage} title="Loading Home..." />} />
+          <Route path="/login" element={<LazyElement component={Login} title="Loading Login..." />} />
+          <Route path="/signup" element={<LazyElement component={Signup} title="Loading Signup..." />} />
 
           {/* Protected Admin Routes */}
           <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<Admindashboard />} />
-              <Route path="users" element={<UserManagement />} />
-              <Route path="users/:id" element={<UserDetailedPage />} />
-              <Route path="student/view/:id" element={<AdminViewStudent />} />
+              <Route
+                path="dashboard"
+                element={<LazyElement component={Admindashboard} title="Loading Admin Dashboard..." />}
+              />
+              <Route
+                path="users"
+                element={<LazyElement component={UserManagement} title="Loading Users..." />}
+              />
+              <Route
+                path="users/:id"
+                element={<LazyElement component={UserDetailedPage} title="Loading User Details..." />}
+              />
+              <Route
+                path="student/view/:id"
+                element={<LazyElement component={AdminViewStudent} title="Loading Student..." />}
+              />
             </Route>
           </Route>
 
@@ -184,26 +101,65 @@ function App() {
             element={<ConditionalRoute component={About} authPath="/app/about" />}
           />
 
-          <Route path="/google-redirect" element={<GoogleRedirect />} />
-          <Route path="/verify-email" element={<VerifyEmailPage />} />
-          <Route path="/verify-email-cheak" element={<VerifyEmailPage />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/create-profile" element={<EditProfile />} />
+          <Route
+            path="/google-redirect"
+            element={<LazyElement component={GoogleRedirect} title="Signing you in..." />}
+          />
+          <Route
+            path="/verify-email"
+            element={<LazyElement component={VerifyEmailPage} title="Verifying Email..." />}
+          />
+          <Route
+            path="/verify-email-cheak"
+            element={<LazyElement component={VerifyEmailPage} title="Verifying Email..." />}
+          />
+          <Route
+            path="/forgot-password"
+            element={<LazyElement component={ForgotPassword} title="Loading Password Reset..." />}
+          />
+          <Route
+            path="/reset-password"
+            element={<LazyElement component={ResetPassword} title="Loading Reset Form..." />}
+          />
+          <Route
+            path="/create-profile"
+            element={<LazyElement component={EditProfile} title="Loading Profile..." />}
+          />
 
           {/* Protected Teacher Routes */}
           <Route element={<ProtectedRoute allowedRoles={["teacher"]} />}>
             <Route path="/app" element={<AuthenticatedLayout />}>
               <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="students" element={<StudentList />} />
-              <Route path="students/add" element={<AddStudentPage />} />
-              <Route path="students/edit/:id" element={<EditStudentPage />} />
-              <Route path="student/view/:id" element={<ViewStudentIDCardPage />} />
-              <Route path="print" element={<PrintIDCard />} />
-              <Route path="help" element={<Help />} />
-              <Route path="about" element={<About />} />
-              <Route path="edit" element={<EditProfile />} />
+              <Route
+                path="dashboard"
+                element={<LazyElement component={Dashboard} title="Loading Dashboard..." />}
+              />
+              <Route
+                path="students"
+                element={<LazyElement component={StudentList} title="Loading Students..." />}
+              />
+              <Route
+                path="students/add"
+                element={<LazyElement component={AddStudentPage} title="Loading Add Student..." />}
+              />
+              <Route
+                path="students/edit/:id"
+                element={<LazyElement component={EditStudentPage} title="Loading Edit Student..." />}
+              />
+              <Route
+                path="student/view/:id"
+                element={<LazyElement component={ViewStudentIDCardPage} title="Loading Student View..." />}
+              />
+              <Route
+                path="print"
+                element={<LazyElement component={PrintIDCard} title="Loading Print..." />}
+              />
+              <Route path="help" element={<LazyElement component={Help} title="Loading Help..." />} />
+              <Route path="about" element={<LazyElement component={About} title="Loading About..." />} />
+              <Route
+                path="edit"
+                element={<LazyElement component={EditProfile} title="Loading Profile..." />}
+              />
             </Route>
           </Route>
 
@@ -214,12 +170,12 @@ function App() {
           <Route path="/add_new_student" element={<Navigate to="/app/students/add" replace />} />
           <Route path="/edit" element={<Navigate to="/app/edit" replace />} />
           <Route path="/app/create-profile" element={<Navigate to="/create-profile" replace />} />
-          <Route path="/edit_student/:id" element={<Navigate to="/app/students/edit/:id" replace />} />
-          <Route path="/app/edit_student/:id" element={<Navigate to="/app/students/edit/:id" replace />} />
-          <Route path="/app/student/edit/:id" element={<Navigate to="/app/students/edit/:id" replace />} />
+          <Route path="/edit_student/:id" element={<EditStudentLegacyRedirect />} />
+          <Route path="/app/edit_student/:id" element={<EditStudentLegacyRedirect />} />
+          <Route path="/app/student/edit/:id" element={<EditStudentLegacyRedirect />} />
 
           {/* 404 */}
-          <Route path="*" element={<PageNotFound />} />
+          <Route path="*" element={<LazyElement component={PageNotFound} title="Loading Page..." />} />
         </Routes>
       </ConfirmDialogProvider>
     </>

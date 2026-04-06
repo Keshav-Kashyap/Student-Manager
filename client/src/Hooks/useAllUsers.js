@@ -5,12 +5,12 @@ import { API_BASE } from '../config/api';
 
 const useAllUsers = () => {
   const [users, setUsers] = useState([]);
-  const [totalStudents, setTotalStudents] = useState(0); // ✅ New state
+  const [totalStudents, setTotalStudents] = useState(0); //  New state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchAllUsers = async () => {
-   
+
 
     try {
       const response = await fetch(`${API_BASE}/api/admin`, {
@@ -18,7 +18,7 @@ const useAllUsers = () => {
         credentials: 'include',
 
         headers: {
-          
+
           'Content-Type': 'application/json',
         },
       });
@@ -29,11 +29,11 @@ const useAllUsers = () => {
 
       const data = await response.json();
 
-      // ✅ Extract both users and total count
+      //  Extract both users and total count
       setUsers(data.users || []);
       setTotalStudents(data.totalStudents || 0);
     } catch (err) {
-      console.error("❌ Error fetching all users:", err);
+      console.error(" Error fetching all users:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -46,7 +46,7 @@ const useAllUsers = () => {
 
   return {
     users,
-    totalStudents, // ✅ Exported for your dashboard
+    totalStudents, //  Exported for your dashboard
     loading,
     error,
     refetch: fetchAllUsers,
