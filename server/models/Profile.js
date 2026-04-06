@@ -26,7 +26,7 @@ const profileSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-   phone: {  // ✅ New field added here
+  phone: {  //  New field added here
     type: String,
     required: true,
     validate: {
@@ -48,7 +48,7 @@ const profileSchema = new mongoose.Schema({
   },
 
 
- profileImage: {
+  profileImage: {
     type: String,
     default: '',
   },
@@ -57,8 +57,8 @@ const profileSchema = new mongoose.Schema({
 
 
 
-{
-  timestamps: true,
-});
+  {
+    timestamps: true,
+  });
 
 module.exports = mongoose.model('Profile', profileSchema);

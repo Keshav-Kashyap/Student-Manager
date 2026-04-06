@@ -4,7 +4,7 @@ const { getAllUsersProfileAnalytics } = require('../controllers/AdminAnalyticsCo
 const authMiddleware = require('../middleware/authMiddleware');
 const isAdmin = require('../middleware/isAdmin');
 
-// ✅ Only Admins can access this
+//  Only Admins can access this
 router.get('/', authMiddleware, isAdmin, getAllUsersProfileAnalytics);
 
 

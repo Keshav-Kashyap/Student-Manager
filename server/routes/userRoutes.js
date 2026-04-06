@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken'); // ✅ Add missing import
-const User = require('../models/User'); // ✅ Add missing import (adjust path as needed)
+const jwt = require('jsonwebtoken'); //  Add missing import
+const User = require('../models/User'); //  Add missing import (adjust path as needed)
 
 const {
   registerUser,
@@ -17,7 +17,7 @@ const {
 
 const authMiddleware = require('../middleware/authMiddleware');
 
-// ✅ Auth routes
+//  Auth routes
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/logout', (req, res) => {
@@ -25,21 +25,21 @@ router.post('/logout', (req, res) => {
   res.json({ success: true, message: 'Logged out successfully' });
 });
 
-// ✅ Protected routes
+//  Protected routes
 router.get('/me', authMiddleware, getCurrentUser);
-router.get('/profile', authMiddleware, getCurrentUser); // ✅ Fixed: Use getCurrentUser controller
+router.get('/profile', authMiddleware, getCurrentUser); //  Fixed: Use getCurrentUser controller
 router.get('/', authMiddleware, getAllUsers);
 router.get('/status', authMiddleware, checkAuthStatus);
 
-// ✅ Email verification routes
+//  Email verification routes
 router.get('/verify-email', verifyEmail);
 router.post('/resend-verification', resendVerificationEmail);
 
-// ✅ Password reset routes
+//  Password reset routes
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 
-// ✅ Session login route (fixed with proper imports)
+//  Session login route (fixed with proper imports)
 router.post('/session-login', authMiddleware, async (req, res) => {
   const { token } = req.body;
 
@@ -48,13 +48,13 @@ router.post('/session-login', authMiddleware, async (req, res) => {
     const user = await User.findById(decoded.id);
 
     if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'User not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
       });
     }
 
-    // ✅ Create new session token
+    //  Create new session token
     const sessionToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: '7d'
     });
@@ -66,9 +66,9 @@ router.post('/session-login', authMiddleware, async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
-    res.json({ 
-      success: true, 
-      message: 'Session created', 
+    res.json({
+      success: true,
+      message: 'Session created',
       user: {
         id: user._id,
         name: user.name,
@@ -78,14 +78,14 @@ router.post('/session-login', authMiddleware, async (req, res) => {
     });
   } catch (err) {
     console.error('Session login error:', err);
-    res.status(400).json({ 
-      success: false, 
-      message: 'Invalid token' 
+    res.status(400).json({
+      success: false,
+      message: 'Invalid token'
     });
   }
 });
 
-// ✅ Email verification middleware
+//  Email verification middleware
 const requireEmailVerification = (req, res, next) => {
   if (!req.user.isEmailVerified) {
     return res.status(403).json({

@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const { generateVerificationToken, sendVerificationEmail,sendPasswordResetEmail } = require('../utils/emailService');
+const { generateVerificationToken, sendVerificationEmail, sendPasswordResetEmail } = require('../utils/emailService');
 const Student = require('../models/Student');
 const Profile = require('../models/Profile');
 const bcrypt = require('bcrypt');
@@ -13,36 +13,36 @@ const generateToken = (userId) => {
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-    
+
     // Validation
     if (!name || !email || !password) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Name, email, and password are required' 
+        message: 'Name, email, and password are required'
       });
     }
 
     // Email validation
     if (!email.includes('@')) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Please provide a valid email address' 
+        message: 'Please provide a valid email address'
       });
     }
 
     // Password length validation
     if (password.length < 6) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters long' 
+        message: 'Password must be at least 6 characters long'
       });
     }
 
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'User already exists' 
+        message: 'User already exists'
       });
     }
 
@@ -51,10 +51,10 @@ const registerUser = async (req, res) => {
     const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     // Create user with verification fields
-    const user = await User.create({ 
-      name: name.trim(), 
-      email: email.toLowerCase(), 
-      password, 
+    const user = await User.create({
+      name: name.trim(),
+      email: email.toLowerCase(),
+      password,
       role: role || 'teacher',
       emailVerificationToken: token,
       emailVerificationExpires: verificationExpires,
@@ -64,13 +64,13 @@ const registerUser = async (req, res) => {
     // Send verification email
     try {
       await sendVerificationEmail(email, token, name);
-      console.log('✅ Verification email sent to:', email);
+      console.log(' Verification email sent to:', email);
     } catch (emailError) {
-      console.error('❌ Failed to send verification email:', emailError);
+      console.error(' Failed to send verification email:', emailError);
       // Don't fail registration if email fails, but log the error
     }
 
-    console.log('✅ New user registered:', {
+    console.log(' New user registered:', {
       name: user.name,
       email: user.email,
       role: user.role,
@@ -94,26 +94,26 @@ const registerUser = async (req, res) => {
 
   } catch (err) {
     console.error('Registration error:', err);
-    
+
     // Handle specific MongoDB errors
     if (err.code === 11000) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Email already exists' 
+        message: 'Email already exists'
       });
     }
-    
+
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map(e => e.message);
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: messages.join('. ') 
+        message: messages.join('. ')
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       success: false,
-      message: 'Registration failed', 
+      message: 'Registration failed',
       error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
     });
   }
@@ -123,30 +123,30 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     if (!email || !password) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Email and password are required' 
+        message: 'Email and password are required'
       });
     }
 
     // Find user and include password field
     const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
-    
+
     if (!user) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Invalid credentials' 
+        message: 'Invalid credentials'
       });
     }
 
     // Compare password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Invalid Password' 
+        message: 'Invalid Password'
       });
     }
 
@@ -162,19 +162,19 @@ const loginUser = async (req, res) => {
 
     // Generate JWT token
     const token = generateToken(user._id);
-    
+
     // Set cookie
     res.cookie('jwt', token, {
       httpOnly: true,
-     secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
       maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
 
 
-    
 
-    console.log('✅ User logged in:', {
+
+    console.log(' User logged in:', {
       name: user.name,
       email: user.email,
       id: user._id
@@ -194,12 +194,12 @@ const loginUser = async (req, res) => {
         createdAt: user.createdAt,
       }
     });
-    
+
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Login failed', 
+      message: 'Login failed',
       error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
     });
   }
@@ -210,15 +210,15 @@ const getCurrentUser = async (req, res) => {
   try {
     // req.user.id is set by authMiddleware
     const user = await User.findById(req.user.id).select('-password');
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
-    
-console.log("YOUR USER FOUNDED:",user);
+
+    console.log("YOUR USER FOUNDED:", user);
 
     res.status(200).json({
       success: true,
@@ -226,9 +226,9 @@ console.log("YOUR USER FOUNDED:",user);
     });
   } catch (err) {
     console.error('Get current user error:', err);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'User fetch failed', 
+      message: 'User fetch failed',
       error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
     });
   }
@@ -238,7 +238,7 @@ console.log("YOUR USER FOUNDED:",user);
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select('-password');
-    
+
     const formattedUsers = users.map(user => ({
       id: user._id,
       name: user.name,
@@ -254,8 +254,8 @@ const getAllUsers = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error getting all users:', error);
-    res.status(500).json({ 
+    console.error(' Error getting all users:', error);
+    res.status(500).json({
       success: false,
       message: 'Server error',
       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
@@ -265,49 +265,49 @@ const getAllUsers = async (req, res) => {
 
 // Google Auth endpoints
 const loadAuth = (req, res) => {
-  res.send("✅ Google Auth endpoint hit!");
+  res.send(" Google Auth endpoint hit!");
 };
 
 // controllers/userController.js - successGoogleLogin
 const successGoogleLogin = async (req, res) => {
   try {
     const user = req.user;
-    
-    console.log("✅ Google login success for user:", user.email);
-    console.log("YOUR USERS:",user);
-    // ✅ Generate new token
+
+    console.log(" Google login success for user:", user.email);
+    console.log("YOUR USERS:", user);
+    //  Generate new token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: '7d'
     });
 
-    // ✅ Set token in HTTP-only cookie
+    //  Set token in HTTP-only cookie
     res.cookie('jwt', token, {
       httpOnly: true,
-       secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // ✅ Determine if user has a profile
+    //  Determine if user has a profile
     const hasProfile = user.hasProfile === true;
 
-    // ✅ Build redirect URL
+    //  Build redirect URL
     const redirectUrl = `${process.env.FRONTEND_URL}/google-redirect?success=true&isNew=${!hasProfile}`;
-    console.log("🔁 Success redirect to:", redirectUrl);
+    console.log(" Success redirect to:", redirectUrl);
 
     return res.redirect(redirectUrl);
   } catch (err) {
-    console.error("❌ Google login success handler error:", err);
+    console.error(" Google login success handler error:", err);
     const errorMsg = "Login successful but failed to set session. Please try logging in again.";
     res.redirect(`${process.env.FRONTEND_URL}/google-redirect?error=${encodeURIComponent(errorMsg)}&type=error`);
   }
 };
 
 const failureGoogleLogin = (req, res) => {
-  console.log("❌ Failure handler called");
+  console.log(" Failure handler called");
   const errorMsg = "Google login failed. Please try again.";
   const redirectUrl = `${process.env.FRONTEND_URL}/google-redirect?error=${encodeURIComponent(errorMsg)}&type=error`;
-  console.log("❌ Failure redirect to:", redirectUrl);
+  console.log(" Failure redirect to:", redirectUrl);
   return res.redirect(redirectUrl);
 };
 
@@ -316,7 +316,7 @@ const checkUserExists = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email });
-    
+
     return res.json({
       exists: !!user,
       hasGoogleId: user?.googleId ? true : false,
@@ -344,17 +344,17 @@ const verifyEmail = async (req, res) => {
     console.log('Received token for verification:', token);
 
     // Find the user by email verification token (and check expiry)
-  const user = await User.findOne({
-  emailVerificationToken: token,
-  emailVerificationExpires: { $gt: Date.now() },
-}).select('+emailVerificationToken +emailVerificationExpires');
+    const user = await User.findOne({
+      emailVerificationToken: token,
+      emailVerificationExpires: { $gt: Date.now() },
+    }).select('+emailVerificationToken +emailVerificationExpires');
 
 
     if (!user) {
-  console.log("❌ No user found with that token. Possible reasons:");
-  console.log("- Token expired?");
-  console.log("- Token not saved?");
-  console.log("- select: false fields not included?");
+      console.log(" No user found with that token. Possible reasons:");
+      console.log("- Token expired?");
+      console.log("- Token not saved?");
+      console.log("- select: false fields not included?");
       return res.status(400).json({
         success: false,
         message: 'Invalid or expired verification token',
@@ -367,20 +367,20 @@ const verifyEmail = async (req, res) => {
     user.emailVerificationExpires = undefined;
     await user.save();
 
-    console.log('✅ Email verified for user:', user.email);
+    console.log(' Email verified for user:', user.email);
 
-    // ✅ Create JWT for login session
+    //  Create JWT for login session
     const authToken = generateToken(user._id); // <-- This should be a valid JWT utility
 
-    // ✅ Set JWT in cookie
+    //  Set JWT in cookie
     res.cookie('token', authToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    // ✅ Respond with user data (NO JWT in body)
+    //  Respond with user data (NO JWT in body)
     return res.status(200).json({
       success: true,
       message: 'Email verified and logged in successfully!',
@@ -394,7 +394,7 @@ const verifyEmail = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('❌ Email verification failed:', error);
+    console.error(' Email verification failed:', error);
     return res.status(500).json({
       success: false,
       message: 'Email verification failed',
@@ -407,7 +407,7 @@ const verifyEmail = async (req, res) => {
 const resendVerificationEmail = async (req, res) => {
   try {
     const { email } = req.body;
-    
+
     if (!email) {
       return res.status(400).json({
         success: false,
@@ -415,9 +415,9 @@ const resendVerificationEmail = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ 
+    const user = await User.findOne({
       email: email.toLowerCase(),
-      isEmailVerified: false 
+      isEmailVerified: false
     });
 
     if (!user) {
@@ -438,7 +438,7 @@ const resendVerificationEmail = async (req, res) => {
     // Send new verification email
     await sendVerificationEmail(email, token, user.name);
 
-    console.log('✅ Verification email resent to:', email);
+    console.log(' Verification email resent to:', email);
 
     res.status(200).json({
       success: true,
@@ -460,8 +460,8 @@ const logoutUser = (req, res) => {
   try {
     res.clearCookie('jwt', {
       httpOnly: true,
-     secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
     });
 
     res.status(200).json({
@@ -524,7 +524,7 @@ const forgotPassword = async (req, res) => {
 
     res.status(200).json({ success: true, message: 'Reset link sent to email' });
   } catch (err) {
-    console.error('❌ Forgot Password Error:', err);
+    console.error(' Forgot Password Error:', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -542,17 +542,17 @@ const resetPassword = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid or expired token' });
     }
 
-    // ✅ Password validation
+    //  Password validation
     if (!newPassword || newPassword.length < 6) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Password must be at least 6 characters long' 
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long'
       });
     }
 
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
-    
+
     user.passwordResetToken = null;
     user.passwordResetExpires = null;
 
@@ -560,7 +560,7 @@ const resetPassword = async (req, res) => {
 
     res.status(200).json({ success: true, message: 'Password reset successful' });
   } catch (err) {
-    console.error('❌ Reset Password Error:', err);
+    console.error(' Reset Password Error:', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
@@ -578,8 +578,8 @@ module.exports = {
   verifyEmail,
   resendVerificationEmail,
   logoutUser,
-checkAuthStatus,
-resetPassword,
-forgotPassword,
-checkUserExists
+  checkAuthStatus,
+  resetPassword,
+  forgotPassword,
+  checkUserExists
 };

@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
     },
     minlength: [6, 'Password must be at least 6 characters'],
     validate: {
-      validator: function(password) {
+      validator: function (password) {
         // Only validate if password is being set (not for Google users)
         if (!password && this.googleId) return true;
         return password && password.length >= 6;
@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema({
   // Email verification fields
   isEmailVerified: {
     type: Boolean,
-    default: function() {
+    default: function () {
       // Google users are automatically verified
       return !!this.googleId;
     }
@@ -77,10 +77,10 @@ const userSchema = new mongoose.Schema({
     default: null,
     select: false
   },
-  
-hasProfile: {
+
+  hasProfile: {
     type: Boolean,
-    default: false  // ✅ Default false
+    default: false  //  Default false
   },
   // User status
   isActive: {
@@ -94,7 +94,7 @@ hasProfile: {
 }, {
   timestamps: true,
   toJSON: {
-    transform: function(doc, ret) {
+    transform: function (doc, ret) {
       delete ret.password;
       delete ret.emailVerificationToken;
       delete ret.emailVerificationExpires;
@@ -112,7 +112,7 @@ userSchema.index({ googleId: 1 });
 userSchema.index({ emailVerificationToken: 1 });
 
 // Pre-save middleware to hash password
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   // Only hash password if it's modified and not a Google user
   if (!this.isModified('password') || this.googleId) {
     return next();
@@ -129,7 +129,7 @@ userSchema.pre('save', async function(next) {
 });
 
 // Pre-save middleware to handle email verification for Google users
-userSchema.pre('save', function(next) {
+userSchema.pre('save', function (next) {
   if (this.googleId && !this.isEmailVerified) {
     this.isEmailVerified = true;
     this.emailVerificationToken = undefined;
@@ -139,7 +139,7 @@ userSchema.pre('save', function(next) {
 });
 
 // Instance method to compare password
-userSchema.methods.comparePassword = async function(candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
   if (!this.password) {
     return false;
   }
@@ -147,13 +147,13 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 };
 
 // Instance method to check if verification token is expired
-userSchema.methods.isVerificationTokenExpired = function() {
+userSchema.methods.isVerificationTokenExpired = function () {
   if (!this.emailVerificationExpires) return true;
   return Date.now() > this.emailVerificationExpires.getTime();
 };
 
 // Static method to find user by email (case insensitive)
-userSchema.statics.findByEmail = function(email) {
+userSchema.statics.findByEmail = function (email) {
   return this.findOne({ email: email.toLowerCase() });
 };
 

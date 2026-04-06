@@ -21,7 +21,7 @@ const getAllUsersProfileAnalytics = async (req, res) => {
           : [];
 
         return {
-          id: userId || null,    
+          id: userId || null,
           name: profile.userId?.name || 'Unknown',
           email: profile.userId?.email || 'Unknown',
           collegeName: profile.collegeName || '',
@@ -48,7 +48,7 @@ const getAllUsersProfileAnalytics = async (req, res) => {
       totalStudents,
     });
   } catch (error) {
-    console.error('❌ Error in Admin Analytics:', error);
+    console.error(' Error in Admin Analytics:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

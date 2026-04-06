@@ -8,7 +8,7 @@ const uploadToCloudinary = async (filePath, folderName = 'studentPhotos') => {
     console.log(result);
     return result.secure_url;
   } catch (error) {
-    console.error('❌ Cloudinary upload failed:', error);
+    console.error(' Cloudinary upload failed:', error);
     throw error;
   }
 };

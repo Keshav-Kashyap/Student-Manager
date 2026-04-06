@@ -12,7 +12,7 @@ const getUserId = (req) => {
 const createStudent = async (req, res) => {
   try {
     const userId = getUserId(req);
-   
+
     if (!userId) {
       return res.status(401).json({ success: false, message: 'User identification required.' });
     }
@@ -54,18 +54,18 @@ const getAllStudents = async (req, res) => {
 
     const students = await Student.find({ createdBy: userId }).populate('createdBy', 'name email').sort({ createdAt: -1 });
 
-     const totalCount = await Student.countDocuments();
-    console.log("total Students",totalCount);
+    const totalCount = await Student.countDocuments();
+    console.log("total Students", totalCount);
 
     res.status(200).json({
       success: true,
       count: students.length,
-       totalCount,
+      totalCount,
       data: students,
       message: students.length === 0 ? 'No students found for this user' : 'Students retrieved successfully'
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message || 'Error fetching students', data: [], count: 0, totalCount:0, });
+    res.status(500).json({ success: false, message: error.message || 'Error fetching students', data: [], count: 0, totalCount: 0, });
   }
 };
 
@@ -223,13 +223,13 @@ const getStudentStats = async (req, res) => {
       data: {
         totalStudents,
         classStats,
-        printStatusStats, // ✅ added
+        printStatusStats, //  added
         recentStudents
       }
     });
 
   } catch (error) {
-    console.error('❌ Error in getStudentStats:', error);
+    console.error(' Error in getStudentStats:', error);
     res.status(500).json({
       success: false,
       message: error.message || 'Error fetching student statistics'
