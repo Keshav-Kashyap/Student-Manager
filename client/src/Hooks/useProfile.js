@@ -1,168 +1,222 @@
-// 📁 src/hooks/useProfile.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { API_BASE } from '../config/api';
+
+const PROFILE_STORAGE_KEY = 'userProfile';
+const LEGACY_USER_STORAGE_KEY = 'user';
+
+const safeParseStorage = (key) => {
+  const raw = localStorage.getItem(key);
+
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch (parseError) {
+    console.error(`Failed to parse ${key} from localStorage:`, parseError);
+    localStorage.removeItem(key);
+    return null;
+  }
+};
+
+const withProfileMeta = (profileData) => ({
+  ...profileData,
+  isAuthenticated: true,
+  lastSync: new Date().toISOString(),
+});
 
 const useProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isMountedRef = useRef(true);
+  const activeRequestRef = useRef(0);
 
-  const getProfileFromLocal = () => {
-    try {
-      const profileData = localStorage.getItem('user');
-      if (profileData) {
-        return JSON.parse(profileData);
-      }
-    } catch (error) {
-      console.error(" Error parsing profile data:", error);
+  const getCachedProfile = useCallback(() => {
+    const cachedProfile = safeParseStorage(PROFILE_STORAGE_KEY);
+
+    if (cachedProfile) {
+      return cachedProfile;
     }
-    return null;
-  };
 
-  const fetchUserProfile = async () => {
+    const legacyProfile = safeParseStorage(LEGACY_USER_STORAGE_KEY);
+    if (legacyProfile) {
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(legacyProfile));
+    }
+
+    return legacyProfile;
+  }, []);
+
+  const clearProfile = useCallback(() => {
+    if (isMountedRef.current) {
+      setProfile(null);
+      setError(null);
+    }
+    localStorage.removeItem(PROFILE_STORAGE_KEY);
+    localStorage.removeItem(LEGACY_USER_STORAGE_KEY);
+  }, []);
+
+  const fetchUserProfile = useCallback(async ({ force = false } = {}) => {
+    const requestId = ++activeRequestRef.current;
+    const isLatestRequest = () => requestId === activeRequestRef.current;
+
+    let cachedProfile = null;
+    if (!force) {
+      cachedProfile = getCachedProfile();
+
+      // Show cached profile instantly but still fetch fresh data in background.
+      if (cachedProfile && isMountedRef.current && isLatestRequest()) {
+        setProfile(cachedProfile);
+        setLoading(false);
+      }
+    }
+
+    if (isMountedRef.current && isLatestRequest()) {
+      if (!cachedProfile || force) {
+        setLoading(true);
+      }
+      setError(null);
+    }
+
     try {
-      setLoading(true);
       const res = await fetch(`${API_BASE}/api/profile/me`, {
-        method: 'GET',
-        credentials: 'include', // Use cookies for authentication
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        credentials: 'include',
       });
 
       if (!res.ok) {
         if (res.status === 401) {
-          // User is not authenticated
-          setError('Not authenticated');
           clearProfile();
-          return;
+          if (isMountedRef.current && isLatestRequest()) {
+            setError('Not authenticated');
+          }
+          return null;
         }
-        throw new Error('Failed to fetch profile');
+
+        let message = 'Failed to fetch profile';
+        try {
+          const errorData = await res.json();
+          if (errorData?.message) {
+            message = errorData.message;
+          }
+        } catch {
+          // Ignore JSON parse failures and keep fallback message.
+        }
+
+        throw new Error(message);
       }
 
       const profileData = await res.json();
-      console.log(" Profile data fetched:", profileData);
+      const completeProfile = withProfileMeta(profileData);
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(completeProfile));
 
-      // Store complete profile data
-      const completeProfile = {
-        ...profileData,
-        isAuthenticated: true,
-        lastSync: new Date().toISOString()
-      };
-
-      localStorage.setItem('userProfile', JSON.stringify(completeProfile));
-      localStorage.setItem('user', JSON.stringify(completeProfile)); // For backward compatibility
-      setProfile(completeProfile);
-      setError(null);
-    } catch (err) {
-      console.error(" Error fetching profile:", err);
-      setError(err.message);
-
-      // Fallback to local data
-      const fallbackProfile = getProfileFromLocal();
-      if (fallbackProfile) {
-        setProfile(fallbackProfile);
+      if (isMountedRef.current && isLatestRequest()) {
+        setProfile(completeProfile);
+        setError(null);
       }
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const createProfile = async (profileData) => {
+      return completeProfile;
+    } catch (err) {
+      const message = err?.message || 'Failed to fetch profile';
+      console.error('Error fetching profile:', err);
+
+      if (isMountedRef.current && isLatestRequest()) {
+        setError(message);
+
+        // For network/server issues, keep showing cached data if available.
+        const fallbackProfile = cachedProfile || getCachedProfile();
+        if (fallbackProfile) {
+          setProfile(fallbackProfile);
+        }
+      }
+
+      return null;
+    } finally {
+      if (isMountedRef.current && isLatestRequest()) {
+        setLoading(false);
+      }
+    }
+  }, [clearProfile, getCachedProfile]);
+
+  const runProfileMutation = useCallback(async (url, method, profileData, defaultError) => {
+    setLoading(true);
+    setError(null);
+
     try {
-      setLoading(true);
-      const res = await fetch(`${API_BASE}/api/profile/create`, {
-        method: 'POST',
-        credentials: 'include', // Use cookies for authentication
+      const res = await fetch(url, {
+        method,
+        credentials: 'include',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(profileData)
+        body: JSON.stringify(profileData),
       });
 
       if (!res.ok) {
         if (res.status === 401) {
+          clearProfile();
           throw new Error('Not authenticated');
         }
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to create profile');
+
+        let message = defaultError;
+        try {
+          const errorData = await res.json();
+          if (errorData?.message) {
+            message = errorData.message;
+          }
+        } catch {
+          // Ignore JSON parse failures and keep fallback message.
+        }
+
+        throw new Error(message);
       }
 
       const result = await res.json();
-      console.log(" Profile created:", result);
-
-      // Refresh profile data after creation
-      await fetchUserProfile();
+      await fetchUserProfile({ force: true });
       return result;
     } catch (err) {
-      console.error(" Error creating profile:", err);
-      setError(err.message);
+      const message = err?.message || defaultError;
+      setError(message);
+      console.error('Profile mutation error:', err);
       throw err;
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateProfile = async (profileData) => {
-    try {
-      setLoading(true);
-      const res = await fetch(`${API_BASE}/api/profile/update`, {
-        method: 'PUT',
-        credentials: 'include', // Use cookies for authentication
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(profileData)
-      });
-
-      if (!res.ok) {
-        if (res.status === 401) {
-          throw new Error('Not authenticated');
-        }
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to update profile');
+      if (isMountedRef.current) {
+        setLoading(false);
       }
-
-      const result = await res.json();
-      console.log(" Profile updated:", result);
-
-      // Refresh profile data after update
-      await fetchUserProfile();
-      return result;
-    } catch (err) {
-      console.error(" Error updating profile:", err);
-      setError(err.message);
-      throw err;
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [clearProfile, fetchUserProfile]);
 
-  const clearProfile = () => {
-    setProfile(null);
-    localStorage.removeItem('userProfile');
-    localStorage.removeItem('user');
-  };
+  const createProfile = useCallback(async (profileData) => runProfileMutation(
+    `${API_BASE}/api/profile/create`,
+    'POST',
+    profileData,
+    'Failed to create profile'
+  ), [runProfileMutation]);
+
+  const updateProfile = useCallback(async (profileData) => runProfileMutation(
+    `${API_BASE}/api/profile/update`,
+    'PUT',
+    profileData,
+    'Failed to update profile'
+  ), [runProfileMutation]);
 
   useEffect(() => {
-    // Load from localStorage first for immediate UI update
-    const localProfile = getProfileFromLocal();
-    if (localProfile) {
-      setProfile(localProfile);
-    }
-
-    // Then fetch fresh data from API
+    isMountedRef.current = true;
     fetchUserProfile();
-  }, []);
+
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [fetchUserProfile]);
 
   return {
     profile,
     loading,
     error,
-    refreshProfile: fetchUserProfile,
+    refreshProfile: () => fetchUserProfile({ force: true }),
     createProfile,
     updateProfile,
-    clearProfile
+    clearProfile,
   };
 };
 
