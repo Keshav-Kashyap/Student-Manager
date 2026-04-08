@@ -22,8 +22,8 @@ export const navigationItems = [
     id: "print",
     name: "Print ID", 
     label: "Print ID",
-    icon: CreditCard, // Desktop के लिए CreditCard
-    mobileIcon: Printer, // Mobile के लिए Printer
+    icon: CreditCard, // 
+    mobileIcon: Printer, // 
     href: "/print",
     path: "/app/print"
   },
@@ -34,11 +34,11 @@ export const navigationItems = [
     icon: HelpCircle, 
     href: "/help",
     path: "/app/help",
-    showInMobile: false // Mobile में नहीं दिखाना
+    showInMobile: false // 
   },
 ];
 
-// Mobile के लिए filtered items
+// 
 export const getMobileNavigationItems = () => {
   return navigationItems
     .filter(item => item.showInMobile !== false)

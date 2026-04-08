@@ -5,6 +5,8 @@ import Sidebar from "../components/Sidebar";
 import MobileNavigation from "../components/MobileNavigation";
 import SurajPrintingLoader from "../components/common/loader";
 import { UserManager } from "../Utils/UserManager";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 const AuthenticatedLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -13,13 +15,17 @@ const AuthenticatedLayout = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        if (user) {
+            setLoading(false);
+            return;
+        }
+
         const loadUserData = () => {
             try {
                 const savedUser = UserManager.getSavedUser();
                 if (savedUser) {
                     setUser(savedUser);
                 } else {
-                    setUser(null);
                     navigate("/login", { replace: true });
                 }
             } catch (error) {
@@ -32,32 +38,7 @@ const AuthenticatedLayout = () => {
         };
 
         loadUserData();
-
-        const handleUserDataChange = (event) => {
-            const userData = event.detail;
-            if (userData) {
-                setUser(userData);
-            } else {
-                setUser(null);
-                navigate("/login", { replace: true });
-            }
-        };
-
-        const handleStorageChange = (e) => {
-            if (e.key === "user") {
-                loadUserData();
-            }
-        };
-
-        window.addEventListener("userDataChanged", handleUserDataChange);
-        window.addEventListener("storage", handleStorageChange);
-
-        return () => {
-            window.removeEventListener("userDataChanged", handleUserDataChange);
-            window.removeEventListener("storage", handleStorageChange);
-        };
     }, [navigate]);
-
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth < 1024) {
@@ -74,7 +55,12 @@ const AuthenticatedLayout = () => {
     }, []);
 
     if (loading) {
-        return <SurajPrintingLoader title="Loading..." />;
+        return ( 
+            <div className="w-100 h-100 bg-black">
+            
+            "Loading..."
+            </div>
+        )
     }
 
     return (
@@ -89,13 +75,25 @@ const AuthenticatedLayout = () => {
                     />
                 )}
 
-                <Sidebar
+                {/* <Sidebar
                     isOpen={isSidebarOpen}
                     onClose={() => setIsSidebarOpen(false)}
                     className="h-[calc(100vh-64px)]"
                     user={user}
-                />
+                /> */}
 
+        <SidebarProvider
+            style={
+                {
+                    "--sidebar-width": "calc(var(--spacing) * 72)",
+                    "--header-height": "calc(var(--spacing) * 12)",
+                }
+            }
+        >
+
+             <AppSidebar variant="inset" />
+
+                    <SidebarInset>
                 <main
                     className={`flex-1 p-0 overflow-auto transition-all duration-300 ease-in-out ${isSidebarOpen ? "lg:ml-80" : "lg:ml-0"
                         }`}
@@ -109,6 +107,8 @@ const AuthenticatedLayout = () => {
                     />
                     <MobileNavigation />
                 </main>
+                        </SidebarInset>
+                </SidebarProvider>
             </div>
         </div>
     );

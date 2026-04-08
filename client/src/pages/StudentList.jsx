@@ -5,7 +5,6 @@ import StudentTable from '../components/StudentList/Student/StudentTable';
 
 import ErrorMessage from '../components/StudentList/ui/ErrorMessage';
 import useStudents from '../Hooks/useStudent';
-import SurajPrintingLoader from '../components/common/loader'
 
 import { useNavigate } from 'react-router-dom';
 import {
@@ -14,6 +13,7 @@ import {
   handleDeleteStudent,
   handleDeleteSelected
 } from '../handlers/studentHandlers';
+import StudentTableSkeleton from '@/components/StudentList/common/TableSkeleton';
 
 const StudentListPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -59,16 +59,7 @@ const StudentListPage = () => {
     console.log('Export functionality to be implemented');
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-
-        <Header onAddNewStudent={handleAddNewStudent} />
-       <SurajPrintingLoader title="Loading Students..."  />
-
-      </div>
-    );
-  }
+  
 
   if (error) {
     return (
@@ -97,7 +88,7 @@ const StudentListPage = () => {
           }
         />
 
-        <StudentTable
+      {!loading ?  <StudentTable
           students={filteredStudents}
           selectedStudents={selectedStudents}
           onSelectAll={handleSelectAll}
@@ -108,7 +99,7 @@ const StudentListPage = () => {
             handleDeleteStudent(id, deleteStudent, setSelectedStudents)
           }
           totalStudents={students.length}
-        />
+        /> : <StudentTableSkeleton/>}
       </div>
     </div>
   );

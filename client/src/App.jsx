@@ -1,12 +1,12 @@
 import React, { Suspense, lazy } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import FlashMessageProvider from "./components/common/FlashMessageProvider";
-import LazyFallback from "./components/common/LazyFallback";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import { ConfirmDialogProvider } from "./context/ConfirmDialogContext";
 import AdminLayout from "./Layouts/AdminLayout";
 import AuthenticatedLayout from "./Layouts/AuthenticatedLayout";
 import { UserManager } from "./Utils/UserManager";
+import Dashboard2 from "./app/dashboard/Dashboard2";
 
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Login = lazy(() => import("./pages/Auth/Login"));
@@ -31,6 +31,10 @@ const AdminViewStudent = lazy(() => import("./pages/AdminViewStudent"));
 const PageNotFound = lazy(() => import("./pages/page404"));
 const Chat = lazy(() => import("./pages/Chat"));
 
+const RouteShellFallback = () => (
+  <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50" />
+);
+
 // Helper component to check if user is logged in and route accordingly
 const ConditionalRoute = ({ component: Component, authPath }) => {
   const isLoggedIn = UserManager.getSavedUser();
@@ -40,14 +44,14 @@ const ConditionalRoute = ({ component: Component, authPath }) => {
   }
 
   return (
-    <Suspense fallback={<LazyFallback title="Loading Page..." />}>
+    <Suspense fallback={<RouteShellFallback />}>
       {React.createElement(Component)}
     </Suspense>
   );
 };
 
-const LazyElement = ({ component: Component, title }) => (
-  <Suspense fallback={<LazyFallback title={title} />}>
+const LazyElement = ({ component: Component }) => (
+  <Suspense fallback={<RouteShellFallback />}>
     {React.createElement(Component)}
   </Suspense>
 );
@@ -67,7 +71,10 @@ function App() {
           <Route path="/" element={<LazyElement component={LandingPage} title="Loading Home..." />} />
           <Route path="/login" element={<LazyElement component={Login} title="Loading Login..." />} />
           <Route path="/signup" element={<LazyElement component={Signup} title="Loading Signup..." />} />
-
+          <Route
+            path="dashboard2"
+            element={<LazyElement component={Dashboard2} title="Loading Admin Dashboard..." />}
+          />
           {/* Protected Admin Routes */}
           <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
             <Route path="/admin" element={<AdminLayout />}>
@@ -76,6 +83,7 @@ function App() {
                 path="dashboard"
                 element={<LazyElement component={Admindashboard} title="Loading Admin Dashboard..." />}
               />
+
               <Route
                 path="users"
                 element={<LazyElement component={UserManagement} title="Loading Users..." />}
@@ -135,6 +143,10 @@ function App() {
                 element={<LazyElement component={Dashboard} title="Loading Dashboard..." />}
               />
               <Route
+                path="dashboard2"
+                element={<LazyElement component={Dashboard2} title="Loading Dashboard 2..." />}
+              />
+              <Route
                 path="students"
                 element={<LazyElement component={StudentList} title="Loading Students..." />}
               />
@@ -165,6 +177,7 @@ function App() {
 
           {/* Redirects */}
           <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
+          <Route path="/dashboard2" element={<Navigate to="/app/dashboard2" replace />} />
           <Route path="/students" element={<Navigate to="/app/students" replace />} />
           <Route path="/print" element={<Navigate to="/app/print" replace />} />
           <Route path="/add_new_student" element={<Navigate to="/app/students/add" replace />} />
