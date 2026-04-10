@@ -12,23 +12,23 @@ const {
 
 router.get('/', loadAuth);
 
-// 🔐 Google Auth for LOGIN (existing users only)
+//  Google Auth for LOGIN (existing users only)
 router.get('/google/login',
-  passport.authenticate('google', { 
+  passport.authenticate('google', {
     scope: ['email', 'profile'],
     state: 'login' // Pass state to identify this is login
   })
 );
 
-// 🔐 Google Auth for SIGNUP (create new users)
+//  Google Auth for SIGNUP (create new users)
 router.get('/google/signup',
-  passport.authenticate('google', { 
+  passport.authenticate('google', {
     scope: ['email', 'profile'],
     state: 'signup' // Pass state to identify this is signup
   })
 );
 
-// 🔁 Common Callback - handles both login and signup
+//  Common Callback - handles both login and signup
 router.get('/google/callback', (req, res, next) => {
   const state = req.query.state;
 
@@ -41,7 +41,7 @@ router.get('/google/callback', (req, res, next) => {
       if (err.message === "NO_ACCOUNT_FOUND" && state === 'login') {
         const msg = `No account found with email ${err.email}. Please sign up first.`;
         const redirectUrl = `${process.env.FRONTEND_URL}/google-redirect?error=${encodeURIComponent(msg)}&type=error&email=${encodeURIComponent(err.email)}&action=signup`;
-        console.log("❌ No account (login), redirect:", redirectUrl);
+        console.log(" No account (login), redirect:", redirectUrl);
         return res.redirect(redirectUrl);
       }
 
@@ -55,7 +55,7 @@ router.get('/google/callback', (req, res, next) => {
       return res.redirect(redirectUrl);
     }
 
-    // ✅ Login user and redirect
+    //  Login user and redirect
     req.logIn(user, (err) => {
       if (err) {
         const redirectUrl = `${process.env.FRONTEND_URL}/google-redirect?error=${encodeURIComponent("Login failed.")}&type=error`;

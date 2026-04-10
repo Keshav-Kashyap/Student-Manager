@@ -14,7 +14,7 @@ const useUser = () => {
         return JSON.parse(userData);
       }
     } catch (error) {
-      console.error("❌ Error parsing user data:", error);
+      console.error(" Error parsing user data:", error);
     }
     return null;
   };
@@ -42,7 +42,7 @@ const useUser = () => {
       localStorage.setItem('user', JSON.stringify(updatedUser));
       setUser(updatedUser);
     } catch (err) {
-      console.error("❌ Error fetching user profile:", err);
+      console.error(" Error fetching user profile:", err);
       setError(err.message);
       // fallback to local data
       const fallbackUser = getUserFromLocal();

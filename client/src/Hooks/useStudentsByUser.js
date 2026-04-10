@@ -14,7 +14,7 @@ const useStudentsByUser = (userId) => {
       try {
         const res = await fetch(`${API_BASE}/api/students/user/${userId}`, {
           method: 'GET',
-          credentials: 'include', // ✅ Send JWT cookie
+          credentials: 'include', //  Send JWT cookie
           headers: {
             'Content-Type': 'application/json'
           }

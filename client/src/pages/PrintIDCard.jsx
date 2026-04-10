@@ -10,7 +10,7 @@ import IDCardGrid from '../components/StudentId/IDCardGrid';
 import PrintStyles from '../components/StudentId/PrintStyles';
 import toast from 'react-hot-toast';
 import { handleDeleteStudent } from '../handlers/studentHandlers';
-import PrintStatsService from '../Utils/printStatsService'; // ✅ your backend API-based service
+import PrintStatsService from '../Utils/printStatsService'; //  your backend API-based service
 import { useConfirm } from '../context/ConfirmDialogContext';
 import { API_BASE } from '../config/api';
 
@@ -60,7 +60,7 @@ const StudentIDPrintPage = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [printStats, setPrintStats] = useState(null);
   const [isPrinting, setIsPrinting] = useState(false);
-  const confirm = useConfirm(); 
+  const confirm = useConfirm();
   const { students, setStudents, loading, error, fetchStudents, deleteStudent } = useStudents();
 
   useEffect(() => {
@@ -106,7 +106,7 @@ const StudentIDPrintPage = () => {
       "Are you sure you want to print selected students' ID cards?",
       "Print ID Cards"
     );
-    
+
     if (confirmed) {
       handleConfirmPrint();
     }
@@ -138,7 +138,7 @@ const StudentIDPrintPage = () => {
       const updatedStats = await PrintStatsService.getFormattedStats();
       setPrintStats(updatedStats);
 
-      toast.success(`Sent ${studentsToPrint.length} ID card(s) to print queue ✅`, {
+      toast.success(`Sent ${studentsToPrint.length} ID card(s) to print queue `, {
         duration: 3000,
         icon: '📤'
       });

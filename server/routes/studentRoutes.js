@@ -4,7 +4,7 @@ const isAdmin = require('../middleware/isAdmin')
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('../config/cloudinary'); // Fixed: Import from config, not utils
- const Student = require('../models/Student');
+const Student = require('../models/Student');
 const {
   createStudent,
   getAllStudents,
@@ -45,7 +45,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 // Multer configuration
-const upload = multer({ 
+const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
@@ -67,14 +67,14 @@ const handleMulterError = (err, req, res, next) => {
       message: `Upload error: ${err.message}`
     });
   }
-  
+
   if (err.message === 'Only image files are allowed!') {
     return res.status(400).json({
       success: false,
       message: 'Only image files (jpg, jpeg, png, gif, webp) are allowed!'
     });
   }
-  
+
   next(err);
 };
 
@@ -135,44 +135,44 @@ router.put('/update-print-status', auth, async (req, res) => {
 
     // Validate input
     if (!studentIds || !Array.isArray(studentIds) || studentIds.length === 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Student IDs are required and should be an array' 
+        message: 'Student IDs are required and should be an array'
       });
     }
 
     if (!printStatus) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Print status is required' 
+        message: 'Print status is required'
       });
     }
 
     // Import Student model (add this at the top of file if not already imported)
-   
+
 
     // Update multiple students' print status
-   const updateResult = await Student.updateMany(
-  { 
-    _id: { $in: studentIds },
-    createdBy: req.user.id // ✅ Security check: Only update own students
-  },
-  { 
-   $set: {
-  printStatus: printStatus,
-  printedAt: printedAt || new Date(),
-  updatedAt: new Date(),
-  updatedAfterPrint: ['printed', 'sent_to_print'].includes(printStatus) ? false : true
-}
+    const updateResult = await Student.updateMany(
+      {
+        _id: { $in: studentIds },
+        createdBy: req.user.id //  Security check: Only update own students
+      },
+      {
+        $set: {
+          printStatus: printStatus,
+          printedAt: printedAt || new Date(),
+          updatedAt: new Date(),
+          updatedAfterPrint: ['printed', 'sent_to_print'].includes(printStatus) ? false : true
+        }
 
-  }
-);
+      }
+    );
 
     // Check if any documents were updated
     if (updateResult.modifiedCount === 0) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: 'No students found with provided IDs or access denied' 
+        message: 'No students found with provided IDs or access denied'
       });
     }
 
@@ -188,48 +188,48 @@ router.put('/update-print-status', auth, async (req, res) => {
 
   } catch (error) {
     console.error('Error updating print status:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
       message: 'Internal server error while updating print status',
-      error: error.message 
+      error: error.message
     });
   }
 });
 
 // NEW: Individual student print status update route
-router.put('/:id/print-status' , auth, async (req, res) => {
+router.put('/:id/print-status', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const { printStatus, printedAt } = req.body;
 
     if (!printStatus) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Print status is required' 
+        message: 'Print status is required'
       });
     }
 
     // Import Student model (add this at the top of file if not already imported)
-   
 
-   const updatedStudent = await Student.findOneAndUpdate(
-  { 
-    _id: id,
-    createdBy: req.user.id
-  },
-  { 
-    printStatus: printStatus,
-    printedAt: printedAt || new Date(),
-    updatedAt: new Date(),
-    updatedAfterPrint: ['printed', 'sent_to_print'].includes(printStatus) ? false : true
-  },
-  { new: true }
-);
+
+    const updatedStudent = await Student.findOneAndUpdate(
+      {
+        _id: id,
+        createdBy: req.user.id
+      },
+      {
+        printStatus: printStatus,
+        printedAt: printedAt || new Date(),
+        updatedAt: new Date(),
+        updatedAfterPrint: ['printed', 'sent_to_print'].includes(printStatus) ? false : true
+      },
+      { new: true }
+    );
 
     if (!updatedStudent) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: 'Student not found or access denied' 
+        message: 'Student not found or access denied'
       });
     }
 
@@ -241,10 +241,10 @@ router.put('/:id/print-status' , auth, async (req, res) => {
 
   } catch (error) {
     console.error('Error updating student print status:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
       message: 'Internal server error',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -253,7 +253,7 @@ router.put('/:id/print-status' , auth, async (req, res) => {
 router.get('/', getAllStudents);
 
 // Get single student by ID
-router.get('/:id',  getStudentById);
+router.get('/:id', getStudentById);
 
 // Create new student with photo upload
 router.post('/', upload.single('photo'), handleMulterError, createStudent);
@@ -279,7 +279,7 @@ router.use((err, req, res, next) => {
 
 // GET /api/students/stats/printed-summary (for Admin)
 // GET /api/students/stats/admin-printed-summary
-router.get('/stats/admin-printed-summary', auth,isAdmin, async (req, res) => {
+router.get('/stats/admin-printed-summary', auth, isAdmin, async (req, res) => {
   try {
     const printedStudents = await Student.find({ printStatus: 'printed' });
 
@@ -335,9 +335,9 @@ router.get('/stats/user', async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const userPrinted = await Student.find({ 
-      createdBy: userId, 
-      printStatus: 'printed' 
+    const userPrinted = await Student.find({
+      createdBy: userId,
+      printStatus: 'printed'
     });
 
     const now = new Date();
@@ -357,7 +357,7 @@ router.get('/stats/user', async (req, res) => {
       todayPrints,
       thisWeekPrints,
       thisMonthPrints,
-      lastPrintDate: userPrinted.length > 0 
+      lastPrintDate: userPrinted.length > 0
         ? new Date(Math.max(...userPrinted.map(s => new Date(s.printedAt).getTime())))
         : null
     });

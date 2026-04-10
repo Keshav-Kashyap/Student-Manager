@@ -18,22 +18,22 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
   const [customFieldErrors, setCustomFieldErrors] = useState({});
   const [isCreateMode, setIsCreateMode] = useState(false);
   const [hasProfile, setHasProfile] = useState(null); // null = unknown, true = has profile, false = no profile
-  
+
   // State for user data from login/navigation
   const [userData, setUserData] = useState(null);
   const [isVerifyingSession, setIsVerifyingSession] = useState(true);
   const [sessionChecked, setSessionChecked] = useState(false);
 
   // Use the useProfile hook for profile operations
-  const { 
-    profile, 
-    loading: profileLoading, 
-    error: profileError, 
+  const {
+    profile,
+    loading: profileLoading,
+    error: profileError,
     refreshProfile,
     createProfile,
     updateProfile
   } = useProfile();
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -52,12 +52,12 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
   const [profileImage, setProfileImage] = useState('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face');
   const [isLoading, setIsLoading] = useState(false);
 
-  // ✅ FIRST CHECK USER SESSION ON MOUNT
+  //  FIRST CHECK USER SESSION ON MOUNT
   useEffect(() => {
     checkUserSession();
   }, []);
 
-  // ✅ CHECK USER SESSION (COOKIE-BASED)
+  //  CHECK USER SESSION (COOKIE-BASED)
   const checkUserSession = async () => {
     console.log('🍪 Checking user session...');
     setIsVerifyingSession(true);
@@ -73,8 +73,8 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ Session verified:', result);
-        
+        console.log(' Session verified:', result);
+
         // Handle both possible response structures
         let user = null;
         if (result.success && result.user) {
@@ -84,7 +84,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
         } else if (result.data && !result.success) {
           user = result.data;
         }
-        
+
         if (user) {
           setUserData(user);
           // Check if user has profile - check multiple possible ways
@@ -94,15 +94,15 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
           console.log('👤 User data:', user);
           console.log('👤 User has profile:', hasUserProfile);
         } else {
-          console.log('❌ No valid session found - no user data');
+          console.log(' No valid session found - no user data');
           navigate('/login');
         }
       } else {
-        console.log('❌ Session verification failed:', response.status);
+        console.log(' Session verification failed:', response.status);
         navigate('/login');
       }
     } catch (error) {
-      console.error('❌ Session check error:', error);
+      console.error(' Session check error:', error);
       navigate('/login');
     } finally {
       setIsVerifyingSession(false);
@@ -110,16 +110,16 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
     }
   };
 
-  // ✅ DETERMINE CREATE MODE BASED ON PATH AND PROFILE STATUS
+  //  DETERMINE CREATE MODE BASED ON PATH AND PROFILE STATUS
   useEffect(() => {
     if (!sessionChecked || !userData) return;
 
     const path = location.pathname;
     const isCreatePath = path.includes('/create-profile');
-    
+
     // Check if user has profile based on multiple indicators
     let userHasProfile = false;
-    
+
     if (hasProfile !== null) {
       userHasProfile = hasProfile;
     } else if (profile && Object.keys(profile).length > 0) {
@@ -127,40 +127,40 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
     } else if (userData.hasProfile !== undefined) {
       userHasProfile = userData.hasProfile;
     }
-    
+
     console.log('🔍 Profile check:', {
       hasProfile,
       profileExists: profile && Object.keys(profile).length > 0,
       userHasProfile,
       isCreatePath
     });
-    
+
     // If user explicitly navigated to crea te-profile, respect that
     if (isCreatePath) {
       setIsCreateMode(true);
-      console.log('✅ Create mode - explicit path');
-    } 
+      console.log(' Create mode - explicit path');
+    }
     // If user has no profile, force create mode
     else if (!userHasProfile) {
       setIsCreateMode(true);
-      console.log('✅ Create mode - no profile found');
-    } 
+      console.log(' Create mode - no profile found');
+    }
     // If user has profile and on edit path, use edit mode
     else {
       setIsCreateMode(false);
-      console.log('✅ Edit mode - profile exists');
+      console.log(' Edit mode - profile exists');
     }
-    
+
     // Update hasProfile state if it was null
     if (hasProfile === null) {
       setHasProfile(userHasProfile);
     }
   }, [sessionChecked, userData, hasProfile, profile, location.pathname]);
 
-  // ✅ LOAD PROFILE DATA WHEN NOT IN CREATE MODE
+  //  LOAD PROFILE DATA WHEN NOT IN CREATE MODE
   useEffect(() => {
     if (!sessionChecked || !userData) return;
-    
+
     // Only load profile if in edit mode and don't have profile data yet
     if (!isCreateMode && !profile && !profileLoading) {
       console.log("🔄 Loading profile for edit mode...");
@@ -168,13 +168,13 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
     }
   }, [sessionChecked, userData, isCreateMode, profile, profileLoading, refreshProfile]);
 
-  // ✅ FORM DATA INITIALIZATION
+  //  FORM DATA INITIALIZATION
   useEffect(() => {
     if (!sessionChecked) return;
 
     const initializeFormData = () => {
       console.log('📝 Initializing form data...');
-      
+
       if (isCreateMode && userData) {
         console.log("📝 Using user data for create mode:", userData);
         setFormData(prev => ({
@@ -188,7 +188,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
           address: userData.address || '',
           emergencyContact: userData.emergencyContact || ''
         }));
-        
+
         if (userData.profileImage) {
           setProfileImage(userData.profileImage);
         }
@@ -209,7 +209,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
           newPassword: '',
           confirmPassword: ''
         }));
-        
+
         if (profile.profileImage) {
           setProfileImage(profile.profileImage);
         }
@@ -223,8 +223,8 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
   }, [
     sessionChecked,
     userData,
-    profile, 
-    profileLoading, 
+    profile,
+    profileLoading,
     isCreateMode,
     isVerifyingSession
   ]);
@@ -306,7 +306,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
           setIsLoading(false);
           return;
         }
-        
+
         if (!isCreateMode && !formData.currentPassword) {
           toast.error('Current password is required to change password');
           setIsLoading(false);
@@ -315,16 +315,16 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
       }
 
       if (isCreateMode) {
-        console.log("🚀 Creating profile with data:", profileData);
+        console.log(" Creating profile with data:", profileData);
         const result = await createProfile(profileData);
         toast.success('Profile created successfully! Welcome aboard!');
-        
+
         // Update user session to reflect profile creation
         setHasProfile(true);
-        
+
         // Refresh profile data
         await refreshProfile();
-        
+
         // Reset password fields
         setFormData(prev => ({
           ...prev,
@@ -332,17 +332,17 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
           newPassword: '',
           confirmPassword: ''
         }));
-        
+
         // Navigate to dashboard
         navigate('/app/dashboard');
       } else {
         console.log("🔄 Updating profile with data:", profileData);
         const result = await updateProfile(profileData);
         toast.success('Profile updated successfully!');
-        
+
         // Refresh profile data
         await refreshProfile();
-        
+
         // Reset password fields
         setFormData(prev => ({
           ...prev,
@@ -350,12 +350,12 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
           newPassword: '',
           confirmPassword: ''
         }));
-        
+
         // Navigate to dashboard
         navigate('/app/dashboard');
       }
     } catch (error) {
-      console.error("❌ Profile save error:", error);
+      console.error(" Profile save error:", error);
       toast.error(error.message || 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
@@ -373,35 +373,35 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
   const renderActiveForm = () => {
     if (activeTab === 'personal') {
       return (
-        <PersonalInfoForm 
+        <PersonalInfoForm
           key="personal-form"
-          formData={formData} 
-          onChange={handleInputChange} 
-          isCreateMode={isCreateMode} 
+          formData={formData}
+          onChange={handleInputChange}
+          isCreateMode={isCreateMode}
           showErrors={showErrors}
           fieldErrors={customFieldErrors}
         />
       );
     }
-    
+
     if (activeTab === 'security') {
       return (
-        <SecurityForm 
+        <SecurityForm
           key="security-form"
-          formData={formData} 
-          onChange={handleInputChange} 
-          isCreateMode={isCreateMode} 
-         userEmail={formData.email || userData?.email} 
+          formData={formData}
+          onChange={handleInputChange}
+          isCreateMode={isCreateMode}
+          userEmail={formData.email || userData?.email}
         />
       );
     }
-    
+
     return (
-      <PersonalInfoForm 
+      <PersonalInfoForm
         key="default-form"
-        formData={formData} 
-        onChange={handleInputChange} 
-        isCreateMode={isCreateMode} 
+        formData={formData}
+        onChange={handleInputChange}
+        isCreateMode={isCreateMode}
         showErrors={showErrors}
         fieldErrors={customFieldErrors}
       />
@@ -412,32 +412,32 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
   const headerIcon = isCreateMode ? UserPlus : User;
   const HeaderIcon = headerIcon;
 
-  // ✅ LOADING STATES
+  //  LOADING STATES
   if (isVerifyingSession || !sessionChecked) {
     return (
-      <SurajPrintingLoader 
-        title="Verifying Your Session..." 
-        subtitle="Please wait while we verify your login..." 
+      <SurajPrintingLoader
+        title="Verifying Your Session..."
+        subtitle="Please wait while we verify your login..."
       />
     );
   }
 
   if (!isCreateMode && profileLoading) {
     return (
-      <SurajPrintingLoader 
-        title="Loading Profile..." 
-        subtitle="Setting up your account..." 
+      <SurajPrintingLoader
+        title="Loading Profile..."
+        subtitle="Setting up your account..."
       />
     );
   }
 
-  // ✅ ERROR STATES
+  //  ERROR STATES
   if (profileError && !profile && !isCreateMode) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 font-medium">Error loading profile: {profileError}</p>
-          <button 
+          <button
             onClick={refreshProfile}
             className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
           >
@@ -448,7 +448,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
     );
   }
 
-  // ✅ ACCESS VALIDATION
+  //  ACCESS VALIDATION
   if (!userData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -458,7 +458,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
           <p className="text-gray-600 font-medium mb-6">
             Please login first to access your profile.
           </p>
-          <button 
+          <button
             onClick={() => navigate('/login')}
             className="w-full px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
           >
@@ -473,10 +473,10 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
   const displayName = formData.name || userData?.name || '';
   const displayEmail = formData.email || userData?.email || '';
 
-  // ✅ MAIN RENDER
+  //  MAIN RENDER
   const renderMainContent = () => (
     <div className="bg-white  mb-[50px] rounded-2xl shadow-xl p-8 ">
-      <ProfileHeader 
+      <ProfileHeader
         name={displayName}
         email={displayEmail}
         profileImage={profileImage}
@@ -484,7 +484,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
         isCreateMode={isCreateMode}
       />
 
-      <TabNavigation 
+      <TabNavigation
         activeTab={activeTab}
         onTabChange={setActiveTab}
         isCreateMode={isCreateMode}
@@ -494,7 +494,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
         <div key={activeTab}>
           {renderActiveForm()}
         </div>
-        <SubmitButton 
+        <SubmitButton
           loading={isLoading}
           isCreateMode={isCreateMode}
         />
@@ -515,7 +515,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
               </div>
               {pageTitle}
             </h1>
-            
+
             <button
               onClick={handleGoBack}
               className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-medium transition-colors"

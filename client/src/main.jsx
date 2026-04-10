@@ -4,11 +4,11 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
 import './index.css';
 
-// ✅ Disable console logs in production
+//  Disable console logs in production
 if (import.meta.env.MODE === 'production') {
-  console.log = () => {};
-  console.warn = () => {};
-  console.info = () => {};
+  console.log = () => { };
+  console.warn = () => { };
+  console.info = () => { };
   // Optional: disable errors too
   // console.error = () => {};
 }

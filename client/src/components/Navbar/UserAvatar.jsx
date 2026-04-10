@@ -14,9 +14,9 @@ const UserAvatar = ({ user, size = "sm" }) => {
 
   try {
     localUser = localUserString ? JSON.parse(localUserString) : null;
-    console.log("✅ Parsed local user:", localUser);
+    console.log(" Parsed local user:", localUser);
   } catch (e) {
-    console.error("❌ Error parsing local user:", e);
+    console.error(" Error parsing local user:", e);
   }
 
   const avatarSize = sizeClasses[size] || sizeClasses.sm;

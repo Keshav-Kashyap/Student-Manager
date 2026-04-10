@@ -27,7 +27,7 @@ const Login = () => {
   // Handle OAuth token from URL parameters
   React.useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    
+
     // Use the token verification service to handle OAuth tokens
     TokenVerificationService.handleOAuthToken(searchParams, navigate)
       .then(handled => {
@@ -73,21 +73,21 @@ const Login = () => {
         // Navigate based on user role
         const userRole = response.user?.role;
         const hasProfile = response.user?.hasProfile;
-        console.log("In login has profile:",hasProfile);
-      if (userRole === 'admin') {
-  navigate('/admin/dashboard');
-} else if (!hasProfile) {
-  // ✅ If profile not created yet, go to profile setup
-  navigate('/app/create-profile', {
-    state: {
-      userData: response.user,
-      fromLogin: true
-    }
-  });
-} else {
-  // ✅ Normal dashboard
-  navigate('/app/dashboard');
-}
+        console.log("In login has profile:", hasProfile);
+        if (userRole === 'admin') {
+          navigate('/admin/dashboard');
+        } else if (!hasProfile) {
+          //  If profile not created yet, go to profile setup
+          navigate('/app/create-profile', {
+            state: {
+              userData: response.user,
+              fromLogin: true
+            }
+          });
+        } else {
+          //  Normal dashboard
+          navigate('/app/dashboard');
+        }
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -96,11 +96,11 @@ const Login = () => {
 
       if (error.response?.data) {
         const { message, requiresEmailVerification, email } = error.response.data;
-        
+
         if (requiresEmailVerification) {
           errorMessage = 'Please verify your email before logging in.';
           toast.error(errorMessage);
-          
+
           // Redirect to email verification page with email parameter
           const verificationUrl = `/verify-email?email=${encodeURIComponent(email || formData.email)}`;
           navigate(verificationUrl, {
@@ -112,7 +112,7 @@ const Login = () => {
           });
           return;
         }
-        
+
         errorMessage = message || errorMessage;
       } else if (error.message) {
         errorMessage = error.message;
@@ -126,8 +126,8 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-  window.location.href = `${API_BASE}/auth/google/login`;
-};
+    window.location.href = `${API_BASE}/auth/google/login`;
+  };
 
   return (
     <AuthLayout>

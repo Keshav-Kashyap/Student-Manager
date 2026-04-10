@@ -1,7 +1,7 @@
 import React from "react";
 import { Edit, Info, HelpCircle, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { logoutUser } from "../../Utils/auth"; // ✅ Import utility
+import { logoutUser } from "../../Utils/auth"; //  Import utility
 
 const DropdownMenu = ({ isOpen, onClose, position = "desktop" }) => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const DropdownMenu = ({ isOpen, onClose, position = "desktop" }) => {
   const handleClick = (e, item) => {
     if (item.label === "Logout") {
       e.preventDefault();
-      logoutUser(navigate); // ✅ Use the utility
+      logoutUser(navigate); //  Use the utility
     }
     onClose(); // Close the dropdown in any case
   };
@@ -35,11 +35,10 @@ const DropdownMenu = ({ isOpen, onClose, position = "desktop" }) => {
         <a
           key={item.label}
           href={item.href}
-          className={`${baseClasses} px-4 py-3 ${
-            item.label === "Logout"
+          className={`${baseClasses} px-4 py-3 ${item.label === "Logout"
               ? "text-red-600 hover:bg-red-50 hover:text-red-700"
               : "text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
-          }`}
+            }`}
           onClick={(e) => handleClick(e, item)}
         >
           {item.icon}

@@ -15,7 +15,7 @@ const EditStudentPage = () => {
   const { id } = useParams(); // Get student ID from URL
   console.log(id);
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
     name: '',
     fatherName: '',
@@ -106,7 +106,7 @@ const EditStudentPage = () => {
         toast.error('Please select a valid image file');
         return;
       }
-      
+
       // Check file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast.error('Photo size should be less than 5MB');
@@ -142,7 +142,7 @@ const EditStudentPage = () => {
     e.preventDefault();
 
     const submitData = new FormData();
-    
+
     // Add all form fields to FormData
     submitData.append('name', formData.name);
     submitData.append('class', formData.class);
@@ -152,7 +152,7 @@ const EditStudentPage = () => {
     submitData.append('motherName', formData.motherName);
     submitData.append('dateOfBirth', formData.dateOfBirth);
     submitData.append('other', formData.other);
-    
+
     // Add photo only if a new photo is selected
     if (formData.photo) {
       submitData.append('photo', formData.photo);
@@ -169,15 +169,15 @@ const EditStudentPage = () => {
       const result = await response.json();
 
       if (response.ok) {
-        toast.success("✅ Student updated successfully!");
+        toast.success(" Student updated successfully!");
         navigate('/app/students'); // Redirect to students list
       } else {
-        toast.error(result.message || "❌ Failed to update student.");
+        toast.error(result.message || " Failed to update student.");
         console.error('Server error:', result);
       }
     } catch (error) {
       console.error("Update Error:", error);
-      toast.error("❌ Something went wrong while updating the student.");
+      toast.error(" Something went wrong while updating the student.");
     }
   };
 
@@ -209,33 +209,33 @@ const EditStudentPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-6">
       <div className="max-w-4xl mx-auto">
         <HeaderSection title="Edit Student" subtitle="Update student information" />
-        
+
         <div className="bg-white rounded-2xl shadow-xl border border-blue-100 p-8">
           <div className="space-y-6">
-            <PhotoUploadSection 
-              formData={formData} 
+            <PhotoUploadSection
+              formData={formData}
               photoPreview={photoPreview}
-              handlePhotoChange={handlePhotoChange} 
+              handlePhotoChange={handlePhotoChange}
               removePhoto={removePhoto}
             />
-            
-            <PersonalInfoSection 
-              formData={formData} 
-              handleInputChange={handleInputChange} 
+
+            <PersonalInfoSection
+              formData={formData}
+              handleInputChange={handleInputChange}
             />
-            
-            <ParentsInfoSection 
-              formData={formData} 
-              handleInputChange={handleInputChange} 
+
+            <ParentsInfoSection
+              formData={formData}
+              handleInputChange={handleInputChange}
             />
-            
-            <AddressInfoSection 
-              formData={formData} 
-              handleInputChange={handleInputChange} 
+
+            <AddressInfoSection
+              formData={formData}
+              handleInputChange={handleInputChange}
             />
-            
-            <ActionButtons 
-              handleSubmit={handleSubmit} 
+
+            <ActionButtons
+              handleSubmit={handleSubmit}
               handleClear={handleClear}
               handleCancel={handleCancel}
               isEditMode={true}

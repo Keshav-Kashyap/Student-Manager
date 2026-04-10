@@ -13,7 +13,7 @@ const getUserId = () => {
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
-  
+
   if (response.status === 401) {
     // Token expired or invalid
     console.warn('Authentication failed, clearing stored data');
@@ -72,19 +72,19 @@ export const login = async (credentials) => {
     }
 
     const result = await response.json();
-    console.log('✅ Login successful:', result);
+    console.log(' Login successful:', result);
 
     // Store authentication data
     if (credentials.rememberMe) {
       localStorage.setItem('userId', result.user.id);
     } else {
-      
+
       sessionStorage.setItem('userId', result.user.id);
     }
 
     return result;
   } catch (error) {
-    console.error('❌ Login failed:', error);
+    console.error(' Login failed:', error);
     throw error;
   }
 };
@@ -100,11 +100,11 @@ export const logout = async () => {
     console.warn('Logout request failed:', error.message);
   } finally {
     // Clear authentication data regardless of server response
-   
+
     localStorage.removeItem('userId');
-   
+
     sessionStorage.removeItem('userId');
-    console.log('✅ Logged out successfully');
+    console.log(' Logged out successfully');
   }
 };
 
@@ -129,10 +129,10 @@ export const fetchStudents = async () => {
     });
 
     const result = await handleResponse(response);
-    console.log('✅ Students fetched:', result);
+    console.log(' Students fetched:', result);
     return result;
   } catch (error) {
-    console.error('❌ Fetch students error:', error);
+    console.error(' Fetch students error:', error);
     throw error;
   }
 };
@@ -148,10 +148,10 @@ export const deleteStudent = async (studentId) => {
     });
 
     const result = await handleResponse(response);
-    console.log('✅ Student deleted:', result);
+    console.log(' Student deleted:', result);
     return result;
   } catch (error) {
-    console.error('❌ Delete student error:', error);
+    console.error(' Delete student error:', error);
     throw error;
   }
 };
@@ -168,10 +168,10 @@ export const deleteMultipleStudents = async (studentIds) => {
     });
 
     const result = await handleResponse(response);
-    console.log('✅ Students batch deleted:', result);
+    console.log(' Students batch deleted:', result);
     return result;
   } catch (error) {
-    console.error('❌ Batch delete error:', error);
+    console.error(' Batch delete error:', error);
     throw error;
   }
 };
@@ -187,10 +187,10 @@ export const getStudentById = async (studentId) => {
     });
 
     const result = await handleResponse(response);
-    console.log('✅ Student fetched by ID:', result);
+    console.log(' Student fetched by ID:', result);
     return result;
   } catch (error) {
-    console.error('❌ Get student by ID error:', error);
+    console.error(' Get student by ID error:', error);
     throw error;
   }
 };
@@ -233,10 +233,10 @@ export const createStudent = async (studentData) => {
     });
 
     const result = await handleResponse(response);
-    console.log('✅ Student created:', result);
+    console.log(' Student created:', result);
     return result;
   } catch (error) {
-    console.error('❌ Create student error:', error);
+    console.error(' Create student error:', error);
     throw error;
   }
 };
@@ -279,10 +279,10 @@ export const updateStudent = async (studentId, studentData) => {
     });
 
     const result = await handleResponse(response);
-    console.log('✅ Student updated:', result);
+    console.log(' Student updated:', result);
     return result;
   } catch (error) {
-    console.error('❌ Update student error:', error);
+    console.error(' Update student error:', error);
     throw error;
   }
 };
@@ -302,10 +302,10 @@ export const searchStudents = async (searchQuery) => {
     });
 
     const result = await handleResponse(response);
-    console.log('✅ Search results:', result);
+    console.log(' Search results:', result);
     return result;
   } catch (error) {
-    console.error('❌ Search students error:', error);
+    console.error(' Search students error:', error);
     throw error;
   }
 };
@@ -321,10 +321,10 @@ export const getStudentStats = async () => {
     });
 
     const result = await handleResponse(response);
-    console.log('✅ Student stats:', result);
+    console.log(' Student stats:', result);
     return result;
   } catch (error) {
-    console.error('❌ Get student stats error:', error);
+    console.error(' Get student stats error:', error);
     throw error;
   }
 };
@@ -346,23 +346,23 @@ export const withErrorHandling = (apiFunction) => {
 
 // Initialize user session (call this on app startup)
 export const initializeUser = (userId = null, token = null) => {
-  console.log('🚀 Initializing user session...');
+  console.log(' Initializing user session...');
 
   if (userId) {
     localStorage.setItem('userId', userId);
-    console.log('✅ User ID set:', userId);
+    console.log(' User ID set:', userId);
   } else if (!getUserId()) {
     // Create a demo user ID if none exists
     const demoUserId = 'demo_user_' + Math.random().toString(36).substr(2, 9);
     localStorage.setItem('userId', demoUserId);
-    console.log('✅ Created demo user ID:', demoUserId);
+    console.log(' Created demo user ID:', demoUserId);
   }
 
-  
+
   if (!token) {
     console.log(' Token is not Exitss');
   }
 
-  
+
 };
 export { getHeaders };

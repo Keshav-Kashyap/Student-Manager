@@ -7,7 +7,7 @@ import SurajPrintingLoader from '../components/common/loader'
 const UserDetailedPage = () => {
   const { id } = useParams(); // get user ID from URL
   const { users, error, loading } = useAllUsers();
-  
+
   // 🔍 Debug logs - Check karo console mein
   console.log("=== DEBUG INFO ===");
   console.log("URL ID from useParams:", id);
@@ -15,7 +15,7 @@ const UserDetailedPage = () => {
   console.log("Loading state:", loading);
   console.log("Error state:", error);
   console.log("Users length:", users?.length);
-  
+
   // Agar users array hai toh IDs print karo
   if (users && users.length > 0) {
     console.log("All user IDs:", users.map(u => u.id));
@@ -23,12 +23,12 @@ const UserDetailedPage = () => {
   }
 
   if (error) {
-    console.log("❌ Error occurred:", error);
+    console.log(" Error occurred:", error);
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="bg-white p-8 rounded-2xl shadow-lg text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-red-600 text-2xl">❌</span>
+            <span className="text-red-600 text-2xl"></span>
           </div>
           <h3 className="text-xl font-semibold text-gray-800 mb-2">Error Loading Users</h3>
           <p className="text-red-600 font-medium">{error}</p>
@@ -48,13 +48,13 @@ const UserDetailedPage = () => {
   // User find karo
   const user = users.find((u) => u._id === id);
   console.log("🔍 Found user:", user);
-  
+
   // Agar user nahi mila toh alternative methods try karo
   if (!user) {
-    console.log("❌ User not found with _id, trying with id field...");
+    console.log(" User not found with _id, trying with id field...");
     const userById = users.find((u) => u.id === id);
     console.log("🔍 Found user with id field:", userById);
-    
+
     if (userById) {
       return (
         <div>
@@ -62,7 +62,7 @@ const UserDetailedPage = () => {
         </div>
       );
     }
-    
+
     // Still not found - show detailed error
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -72,7 +72,7 @@ const UserDetailedPage = () => {
           </div>
           <h3 className="text-xl font-semibold text-gray-800 mb-2">User Not Found</h3>
           <p className="text-gray-600 mb-4">No user found with ID: <code className="bg-gray-100 px-2 py-1 rounded">{id}</code></p>
-          
+
           {/* Debug info */}
           <div className="bg-gray-50 p-4 rounded-lg text-left text-sm">
             <p><strong>Available User IDs:</strong></p>
@@ -85,8 +85,8 @@ const UserDetailedPage = () => {
               {users.length > 5 && <li className="text-gray-500">...and {users.length - 5} more</li>}
             </ul>
           </div>
-          
-          <button 
+
+          <button
             onClick={() => window.history.back()}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
@@ -97,7 +97,7 @@ const UserDetailedPage = () => {
     );
   }
 
-  console.log("✅ User found successfully, rendering UserDetailsView");
+  console.log(" User found successfully, rendering UserDetailsView");
   return (
     <div>
       <UserDetailsView user={user} />

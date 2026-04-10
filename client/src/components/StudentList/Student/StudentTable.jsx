@@ -14,7 +14,7 @@ const StudentTable =
     onDelete,
     totalStudents
 }) => {
-console.log("👨‍🎓 Students in StudentTable:", students);
+console.log(" Students in StudentTable:", students);
 
     const isAllSelected = selectedStudents.length === students.length && students.length > 0;
 

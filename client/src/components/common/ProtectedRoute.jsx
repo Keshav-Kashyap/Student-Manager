@@ -1,4 +1,4 @@
-// ✅ ProtectedRoute.jsx (Backend-first + Fallback to UserManager)
+//  ProtectedRoute.jsx (Backend-first + Fallback to UserManager)
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { UserManager } from '../../Utils/UserManager';
@@ -7,7 +7,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Always check session from backend first
+  //  Always check session from backend first
   const fetchUserSession = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/users/profile`, {
@@ -59,7 +59,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
   }
 
   if (!user) {
-    console.warn('❌ Not authenticated');
+    console.warn(' Not authenticated');
     return <Navigate to="/login" replace />;
   }
 
