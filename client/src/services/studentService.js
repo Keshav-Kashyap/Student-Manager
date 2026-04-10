@@ -119,16 +119,26 @@ export const isAuthenticated = () => {
 //  FIXED: Student API functions with proper authentication
 
 // Fetch all students for the authenticated user
-export const fetchStudents = async () => {
+export const fetchStudents = async (page = 1, limit = 10) => {
   try {
-    console.log('📡 Fetching students...');
-    const response = await fetch(`${API_BASE2}`, {
+
+    const response = await fetch(`${API_BASE2}?page=${page}&limit=${limit}`, {
       method: 'GET',
       headers: getHeaders(),
       credentials: 'include'
     });
 
-    const result = await handleResponse(response);
+    // Keep full payload for paginated list responses (count, totalCount, currentPage, totalPages, limit, data).
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.message || 'Operation failed');
+    }
+
     console.log(' Students fetched:', result);
     return result;
   } catch (error) {

@@ -26,7 +26,11 @@ const StudentListPage = () => {
     error,
     fetchStudents,
     deleteStudent,
-    deleteMultipleStudents
+    deleteMultipleStudents,
+    currentPage,
+    totalPages,
+    totalStudents,
+    limit
   } = useStudents();
 
   const filteredStudents = students.filter(student =>
@@ -55,11 +59,18 @@ const StudentListPage = () => {
     navigate('/app/students/add');
   };
 
+  const handlePageChange = async (page) => {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+
+    await fetchStudents(page, limit);
+    setSelectedStudents([]);
+  };
+
   const handleExport = () => {
     console.log('Export functionality to be implemented');
   };
 
-  
+
 
   if (error) {
     return (
@@ -76,11 +87,11 @@ const StudentListPage = () => {
 
       <Header onAddNewStudent={handleAddNewStudent} />
 
-      <div className="max-w-7xl mb-[50px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="w-full overflow-x-auto px-4 py-6 sm:px-6 lg:px-8 xl:px-10 lg:py-8">
         <StudentSearch
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
-          onRefresh={fetchStudents}
+          onRefresh={() => fetchStudents(currentPage, limit)}
           onExport={handleExport}
           selectedCount={selectedStudents.length}
           onDeleteSelected={() =>
@@ -88,7 +99,7 @@ const StudentListPage = () => {
           }
         />
 
-      {!loading ?  <StudentTable
+        {!loading ? <StudentTable
           students={filteredStudents}
           selectedStudents={selectedStudents}
           onSelectAll={handleSelectAll}
@@ -98,9 +109,13 @@ const StudentListPage = () => {
           onDelete={(id) =>
             handleDeleteStudent(id, deleteStudent, setSelectedStudents)
           }
-          totalStudents={students.length}
-        /> : <StudentTableSkeleton/>}
-      </div>
+          totalStudents={totalStudents}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          limit={limit}
+        /> : <StudentTableSkeleton />}
+      </main>
     </div>
   );
 };

@@ -1,40 +1,47 @@
 // constants/navigationItems.js
-import { Home, Users, CreditCard, HelpCircle, Printer } from "lucide-react";
+import { Home, Users, CreditCard, Printer, MessageCircle } from "lucide-react";
 
 export const navigationItems = [
-  { 
+  {
     id: "dashboard",
-    name: "Dashboard", 
+    name: "Dashboard",
     label: "Dashboard",
-    icon: Home, 
+    icon: Home,
     href: "/dashboard",
     path: "/app/dashboard"
   },
-  { 
+  {
     id: "students",
-    name: "Student List", 
+    name: "Student List",
     label: "Student List",
-    icon: Users, 
+    icon: Users,
     href: "/students",
     path: "/app/students"
   },
-  { 
+  {
     id: "print",
-    name: "Print ID", 
+    name: "Print ID",
     label: "Print ID",
     icon: CreditCard, // 
     mobileIcon: Printer, // 
     href: "/print",
     path: "/app/print"
   },
-  { 
-    id: "help",
-    name: "Help Center", 
-    label: "Help Center",
-    icon: HelpCircle, 
-    href: "/help",
-    path: "/app/help",
-    showInMobile: false // 
+  {
+    id: "chat",
+    name: "Chat",
+    label: "Chat",
+    icon: MessageCircle,
+    href: "/chat",
+    path: "/app/chat"
+  },
+  {
+    id: "team",
+    name: "Team",
+    label: "Team",
+    icon: Users,
+    href: "/team",
+    path: "/app/team"
   },
 ];
 
@@ -55,6 +62,7 @@ export const getSidebarNavigationItems = () => {
   return navigationItems.map(item => ({
     name: item.name,
     icon: item.icon,
-    href: item.href
+    href: item.href,
+    path: item.path
   }));
 };

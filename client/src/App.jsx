@@ -20,6 +20,7 @@ const ResetPassword = lazy(() => import("./pages/Auth/ResetPassword"));
 const EditProfile = lazy(() => import("./pages/EditProfile"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const StudentList = lazy(() => import("./pages/StudentList"));
+const Team = lazy(() => import("./pages/Team"));
 const AddStudentPage = lazy(() => import("./pages/AddStudentPage"));
 const EditStudentPage = lazy(() => import("./pages/EditStudentPage"));
 const ViewStudentIDCardPage = lazy(() => import("./pages/ViewStudent"));
@@ -151,6 +152,10 @@ function App() {
                 element={<LazyElement component={StudentList} title="Loading Students..." />}
               />
               <Route
+                path="team"
+                element={<LazyElement component={Team} title="Loading Team..." />}
+              />
+              <Route
                 path="students/add"
                 element={<LazyElement component={AddStudentPage} title="Loading Add Student..." />}
               />
@@ -166,6 +171,10 @@ function App() {
                 path="print"
                 element={<LazyElement component={PrintIDCard} title="Loading Print..." />}
               />
+              <Route
+                path="chat"
+                element={<LazyElement component={Chat} title="Loading Chat..." />}
+              />
               <Route path="help" element={<LazyElement component={Help} title="Loading Help..." />} />
               <Route path="about" element={<LazyElement component={About} title="Loading About..." />} />
               <Route
@@ -179,7 +188,9 @@ function App() {
           <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
           <Route path="/dashboard2" element={<Navigate to="/app/dashboard2" replace />} />
           <Route path="/students" element={<Navigate to="/app/students" replace />} />
+          <Route path="/team" element={<Navigate to="/app/team" replace />} />
           <Route path="/print" element={<Navigate to="/app/print" replace />} />
+          <Route path="/chat" element={<Navigate to="/app/chat" replace />} />
           <Route path="/add_new_student" element={<Navigate to="/app/students/add" replace />} />
           <Route path="/edit" element={<Navigate to="/app/edit" replace />} />
           <Route path="/app/create-profile" element={<Navigate to="/create-profile" replace />} />

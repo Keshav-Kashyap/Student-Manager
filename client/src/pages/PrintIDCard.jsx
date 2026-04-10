@@ -13,45 +13,47 @@ import { handleDeleteStudent } from '../handlers/studentHandlers';
 import PrintStatsService from '../Utils/printStatsService'; //  your backend API-based service
 import { useConfirm } from '../context/ConfirmDialogContext';
 import { API_BASE } from '../config/api';
+import IDCardGridSkeleton from '@/components/StudentId/IDCardGridSkeleton';
+import StudentSelectorSkeleton from '@/components/StudentId/StudentSelectorSkeleton';
 
-// Print Statistics Component
-const PrintStatsBar = ({ stats }) => (
-  <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
-    <div className="flex items-center justify-between mb-4">
-      <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-        <BarChart3 className="w-5 h-5" />
-        Print Statistics
-      </h3>
-    </div>
+// // Print Statistics Component
+// const PrintStatsBar = ({ stats }) => (
+//   <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
+//     <div className="flex items-center justify-between mb-4">
+//       <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+//         <BarChart3 className="w-5 h-5" />
+//         Print Statistics
+//       </h3>
+//     </div>
 
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-      <div className="text-center p-3 bg-blue-50 rounded-lg">
-        <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
-        <div className="text-sm text-gray-600">Total Prints</div>
-      </div>
-      <div className="text-center p-3 bg-green-50 rounded-lg">
-        <div className="text-2xl font-bold text-green-600">{stats.today}</div>
-        <div className="text-sm text-gray-600">Today</div>
-      </div>
-      <div className="text-center p-3 bg-purple-50 rounded-lg">
-        <div className="text-2xl font-bold text-purple-600">{stats.week}</div>
-        <div className="text-sm text-gray-600">This Week</div>
-      </div>
-      <div className="text-center p-3 bg-orange-50 rounded-lg">
-        <div className="text-2xl font-bold text-orange-600">{stats.month}</div>
-        <div className="text-sm text-gray-600">This Month</div>
-      </div>
-      <div className="text-center p-3 bg-gray-50 rounded-lg">
-        <div className="text-sm font-semibold text-gray-600">Last Print</div>
-        <div className="text-xs text-gray-500">{stats.lastPrint}</div>
-      </div>
-    </div>
-  </div>
-);
+//     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+//       <div className="text-center p-3 bg-blue-50 rounded-lg">
+//         <div className="text-2xl font-bold text-blue-600">{stats?.total}</div>
+//         <div className="text-sm text-gray-600">Total Prints</div>
+//       </div>
+//       <div className="text-center p-3 bg-green-50 rounded-lg">
+//         <div className="text-2xl font-bold text-green-600">{stats?.today}</div>
+//         <div className="text-sm text-gray-600">Today</div>
+//       </div>
+//       <div className="text-center p-3 bg-purple-50 rounded-lg">
+//         <div className="text-2xl font-bold text-purple-600">{stats?.week}</div>
+//         <div className="text-sm text-gray-600">This Week</div>
+//       </div>
+//       <div className="text-center p-3 bg-orange-50 rounded-lg">
+//         <div className="text-2xl font-bold text-orange-600">{stats?.month}</div>
+//         <div className="text-sm text-gray-600">This Month</div>
+//       </div>
+//       <div className="text-center p-3 bg-gray-50 rounded-lg">
+//         <div className="text-sm font-semibold text-gray-600">Last Print</div>
+//         <div className="text-xs text-gray-500">{stats?.lastPrint}</div>
+//       </div>
+//     </div>
+//   </div>
+// );
 
 const StudentIDPrintPage = () => {
   const [printSettings, setPrintSettings] = useState({
-    layout: '2x2',
+    layout: '3x2',
     showBorder: true,
     includeLogo: true
   });
@@ -63,13 +65,13 @@ const StudentIDPrintPage = () => {
   const confirm = useConfirm();
   const { students, setStudents, loading, error, fetchStudents, deleteStudent } = useStudents();
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      const backendStats = await PrintStatsService.getFormattedStats();
-      setPrintStats(backendStats);
-    };
-    fetchStats();
-  }, []);
+  // useEffect(() => {
+  //   const fetchStats = async () => {
+  //     const backendStats = await PrintStatsService.getFormattedStats();
+  //     setPrintStats(backendStats);
+  //   };
+  //   fetchStats();
+  // }, []);
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
@@ -171,24 +173,24 @@ const StudentIDPrintPage = () => {
     console.log('PDF export functionality to be implemented');
   };
 
-  if (loading || isPrinting) {
-    return (
-      <SurajPrintingLoader title="Students Id Cards Are Fetching..." subtitle="Loading students for ID cards..." />
-    );
-  }
+  // if (loading || isPrinting) {
+  //   return (
+  //     <SurajPrintingLoader title="Students Id Cards Are Fetching..." subtitle="Loading students for ID cards..." />
+  //   );
+  // }
 
   if (error) {
     return <ErrorMessage error={error} onRetry={fetchStudents} />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen p-5 bg-gray-100">
       {/* Print Statistics Bar */}
-      <div className="print:hidden bg-white border-b border-gray-200">
+      {/* <div className="print:hidden bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <PrintStatsBar stats={printStats} />
         </div>
-      </div>
+      </div> */}
 
       <PrintHeader
         studentsToPrint={studentsToPrint}
@@ -198,30 +200,30 @@ const StudentIDPrintPage = () => {
         onPrint={handlePrint}
         onExportPDF={handleExportPDF}
       />
-
-      <StudentSelector
-        students={students}
-        selectedStudents={selectedStudents}
-        selectAll={selectAll}
-        onSelectAll={handleSelectAll}
-        onSelectStudent={handleSelectStudent}
-      />
-
-      <div className="print:p-0 p-8 mb-[50px] ">
-        <div className="max-w-7xl mx-auto">
-          {studentsToPrint.length === 0 ? (
-            <EmptyState onRefresh={fetchStudents} />
-          ) : (
-            <IDCardGrid
-              students={studentsToPrint}
-              deleteStudent={deleteStudent}
-              setSelectedStudents={setSelectedStudents}
-              printSettings={printSettings}
-            />
-          )}
+      {!loading ?
+        <StudentSelector
+          students={students}
+          selectedStudents={selectedStudents}
+          selectAll={selectAll}
+          onSelectAll={handleSelectAll}
+          onSelectStudent={handleSelectStudent}
+        /> : <StudentSelectorSkeleton />}
+      {!loading ?
+        <div className="print:p-0 p-4 sm:p-6 lg:p-8 xl:p-10 mb-[50px]">
+          <div className="w-full">
+            {studentsToPrint.length === 0 ? (
+              <EmptyState onRefresh={fetchStudents} />
+            ) : (
+              <IDCardGrid
+                students={studentsToPrint}
+                deleteStudent={deleteStudent}
+                setSelectedStudents={setSelectedStudents}
+                printSettings={printSettings}
+              />
+            )}
+          </div>
         </div>
-      </div>
-
+        : <IDCardGridSkeleton />}
       <PrintStyles />
     </div>
   );
