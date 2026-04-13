@@ -6,6 +6,7 @@ import { UserManager } from "../Utils/UserManager";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AuthContext from "@/context/AuthContext";
+import SurajPrintingLoader from "@/components/common/loader";
 
 const AuthenticatedLayout = () => {
     const { user, loading } = useContext(AuthContext);
@@ -19,7 +20,7 @@ const AuthenticatedLayout = () => {
         return (
             <div className="w-100 h-100 bg-black">
 
-                "Loading..."
+            <SurajPrintingLoader/>
             </div>
         )
     }

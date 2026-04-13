@@ -10,6 +10,7 @@ import useProfile from '../Hooks/useProfile';
 import toast from 'react-hot-toast';
 import SurajPrintingLoader from '../components/common/loader'
 import { API_BASE } from '../config/api';
+import ProfileSkeleton from '@/components/Skeletons/ProfileSkeletons';
 
 const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
   const navigate = useNavigate();
@@ -23,6 +24,17 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
   const [userData, setUserData] = useState(null);
   const [isVerifyingSession, setIsVerifyingSession] = useState(true);
   const [sessionChecked, setSessionChecked] = useState(false);
+
+  const getCachedUser = () => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+      console.error('Failed to parse cached user:', error);
+      localStorage.removeItem('user');
+      return null;
+    }
+  };
 
   // Use the useProfile hook for profile operations
   const {
@@ -62,6 +74,16 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
     console.log('🍪 Checking user session...');
     setIsVerifyingSession(true);
 
+    const cachedUser = getCachedUser();
+    if (cachedUser) {
+      console.log(' Using cached user session');
+      setUserData(cachedUser);
+      setHasProfile(cachedUser.hasProfile ?? false);
+      setIsVerifyingSession(false);
+      setSessionChecked(true);
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE}/api/users/profile`, {
         method: 'GET',
@@ -87,6 +109,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
 
         if (user) {
           setUserData(user);
+          localStorage.setItem('user', JSON.stringify(user));
           // Check if user has profile - check multiple possible ways
           const hasUserProfile = user.hasProfile;
 
@@ -194,7 +217,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
         }
       } else if (!isCreateMode && profile) {
         // Edit mode - use profile data
-        console.log("📝 Using profile data for edit mode:", profile);
+        console.log(" Using profile data for edit mode:", profile);
         setFormData(prev => ({
           ...prev,
           name: profile.name || '',
@@ -231,14 +254,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
 
   // Debug logging
   useEffect(() => {
-    console.log("🔍 Debug Info:");
-    console.log("- sessionChecked:", sessionChecked);
-    console.log("- hasProfile:", hasProfile);
-    console.log("- isCreateMode:", isCreateMode);
-    console.log("- userData:", userData);
-    console.log("- profile:", profile);
-    console.log("- profileLoading:", profileLoading);
-    console.log("- location.pathname:", location.pathname);
+
   }, [sessionChecked, hasProfile, isCreateMode, userData, profile, profileLoading, location.pathname]);
 
   const handleInputChange = (e) => {
@@ -415,19 +431,13 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
   //  LOADING STATES
   if (isVerifyingSession || !sessionChecked) {
     return (
-      <SurajPrintingLoader
-        title="Verifying Your Session..."
-        subtitle="Please wait while we verify your login..."
-      />
+      <ProfileSkeleton />
     );
   }
 
   if (!isCreateMode && profileLoading) {
     return (
-      <SurajPrintingLoader
-        title="Loading Profile..."
-        subtitle="Setting up your account..."
-      />
+      <ProfileSkeleton/>
     );
   }
 

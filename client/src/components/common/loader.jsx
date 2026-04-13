@@ -27,7 +27,7 @@ const SurajPrintingLoader = ({ title = "Processing...", subtitle = "Please wait.
         <div className="mb-4">
           <h2 className="text-xl font-bold text-gray-800 mb-1">
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              {title} this is dimak kharb
+              {title} 
             </span>
           </h2>
           <p className="text-sm text-gray-600">{subtitle}</p>

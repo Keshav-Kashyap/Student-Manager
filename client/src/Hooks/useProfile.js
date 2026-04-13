@@ -61,21 +61,20 @@ const useProfile = () => {
     const requestId = ++activeRequestRef.current;
     const isLatestRequest = () => requestId === activeRequestRef.current;
 
-    let cachedProfile = null;
-    if (!force) {
-      cachedProfile = getCachedProfile();
+    const cachedProfile = !force ? getCachedProfile() : null;
 
-      // Show cached profile instantly but still fetch fresh data in background.
-      if (cachedProfile && isMountedRef.current && isLatestRequest()) {
+    if (!force && cachedProfile) {
+      if (isMountedRef.current && isLatestRequest()) {
         setProfile(cachedProfile);
+        setError(null);
         setLoading(false);
       }
+
+      return cachedProfile;
     }
 
     if (isMountedRef.current && isLatestRequest()) {
-      if (!cachedProfile || force) {
-        setLoading(true);
-      }
+      setLoading(true);
       setError(null);
     }
 

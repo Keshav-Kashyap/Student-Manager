@@ -2,13 +2,33 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { API_BASE } from "../config/api";
 
 const AuthContext = createContext();
+const USER_STORAGE_KEY = "user";
+
+const safeParseUser = () => {
+    try {
+        const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+        return storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+        console.error("Failed to parse cached user:", error);
+        localStorage.removeItem(USER_STORAGE_KEY);
+        return null;
+    }
+};
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => safeParseUser());
     const [loading, setLoading] = useState(true);
 
     //  fetch user once
     const fetchUser = async () => {
+        const cachedUser = safeParseUser();
+
+        if (cachedUser) {
+            setUser(cachedUser);
+            setLoading(false);
+            return cachedUser;
+        }
+
         try {
             const res = await fetch(`${API_BASE}/api/users/profile`, {
                 credentials: "include",
@@ -17,6 +37,7 @@ export const AuthProvider = ({ children }) => {
             const data = await res.json();
 
             if (res.ok && data.success) {
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data.data));
                 setUser(data.data);
             } else {
                 setUser(null);
@@ -36,6 +57,7 @@ export const AuthProvider = ({ children }) => {
 
     //  login helper
     const login = (userData) => {
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
         setUser(userData);
     };
 
@@ -49,6 +71,7 @@ export const AuthProvider = ({ children }) => {
         } catch (err) {
             console.error("Logout error:", err);
         } finally {
+            localStorage.removeItem(USER_STORAGE_KEY);
             setUser(null);
         }
     };

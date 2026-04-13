@@ -8,6 +8,7 @@ import PrintHeader from '../components/StudentId/PrintHeader';
 import StudentSelector from '../components/StudentId/StudentSelector';
 import IDCardGrid from '../components/StudentId/IDCardGrid';
 import PrintStyles from '../components/StudentId/PrintStyles';
+import Pagination from '../components/StudentList/common/Pagination';
 import toast from 'react-hot-toast';
 import { handleDeleteStudent } from '../handlers/studentHandlers';
 import PrintStatsService from '../Utils/printStatsService'; //  your backend API-based service
@@ -57,6 +58,8 @@ const StudentIDPrintPage = () => {
     showBorder: true,
     includeLogo: true
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 6;
 
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -97,6 +100,15 @@ const StudentIDPrintPage = () => {
   const studentsToPrint = selectedStudents.length > 0
     ? students.filter(student => selectedStudents.includes(student._id))
     : students;
+
+  const totalPages = Math.max(1, Math.ceil(studentsToPrint.length / limit));
+  const startIndex = (currentPage - 1) * limit;
+  const paginatedStudentsToPrint = studentsToPrint.slice(startIndex, startIndex + limit);
+
+  const handlePageChange = (page) => {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+    setCurrentPage(page);
+  };
 
   const handlePrint = async () => {
     if (studentsToPrint.length === 0) {
@@ -147,6 +159,7 @@ const StudentIDPrintPage = () => {
 
       setSelectedStudents([]);
       setSelectAll(false);
+      setCurrentPage(1);
     } catch (error) {
       console.error('Error updating print status:', error);
       toast.error('Failed to send to print. Please try again.');
@@ -172,6 +185,12 @@ const StudentIDPrintPage = () => {
 
     console.log('PDF export functionality to be implemented');
   };
+
+  React.useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   // if (loading || isPrinting) {
   //   return (
@@ -214,12 +233,24 @@ const StudentIDPrintPage = () => {
             {studentsToPrint.length === 0 ? (
               <EmptyState onRefresh={fetchStudents} />
             ) : (
-              <IDCardGrid
-                students={studentsToPrint}
-                deleteStudent={deleteStudent}
-                setSelectedStudents={setSelectedStudents}
-                printSettings={printSettings}
-              />
+              <>
+                <IDCardGrid
+                  students={paginatedStudentsToPrint}
+                  deleteStudent={deleteStudent}
+                  setSelectedStudents={setSelectedStudents}
+                  printSettings={printSettings}
+                />
+
+                {studentsToPrint.length > limit && (
+                  <div className="mt-6 flex justify-center print:hidden">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

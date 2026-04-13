@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
+import SurajPrintingLoader from "./loader";
 
 const ProtectedRoute = ({ allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -7,7 +8,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        Loading...
+       <SurajPrintingLoader/>
       </div>
     );
   }
