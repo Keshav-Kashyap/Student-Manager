@@ -35,9 +35,9 @@ const AuthenticatedLayout = () => {
                 <AppSidebar variant="inset" className="md:top-0 md:h-svh" />
 
                 <SidebarInset className="min-w-0 bg-transparent md:m-0 md:rounded-none md:shadow-none">
-                    <div className="sticky top-0 z-40 border-b border-white/50 bg-white/75 backdrop-blur">
+                    {/* <div className="sticky top-0 z-40 border-b border-white/50 bg-white/75 backdrop-blur">
                         <Navbar user={user} embedded />
-                    </div>
+                    </div> */}
 
                     <div className="fixed right-4 top-20 z-40 hidden md:block">
                         <SidebarTrigger className="h-10 w-10 rounded-full border border-white/70 bg-white/90 shadow-lg backdrop-blur hover:bg-white" />

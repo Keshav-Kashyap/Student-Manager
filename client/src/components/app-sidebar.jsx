@@ -31,11 +31,6 @@ function SidebarCollapseButton() {
 }
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navSecondary: [
     {
       title: "Settings",
@@ -46,7 +41,7 @@ const data = {
     },
     {
       title: "Get Help",
-      url: "#",
+      url: "/app/help",
       icon: (
         <CircleHelpIcon />
       ),
@@ -111,7 +106,7 @@ export function AppSidebar({
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border/60 bg-sidebar/70 p-3 backdrop-blur-sm group-data-[collapsible=icon]:p-2">
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );

@@ -6,8 +6,6 @@ import { ConfirmDialogProvider } from "./context/ConfirmDialogContext";
 import AdminLayout from "./Layouts/AdminLayout";
 import AuthenticatedLayout from "./Layouts/AuthenticatedLayout";
 import { UserManager } from "./Utils/UserManager";
-import Dashboard2 from "./app/dashboard/Dashboard2";
-
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Login = lazy(() => import("./pages/Auth/Login"));
 const Signup = lazy(() => import("./pages/Auth/Signup"));
@@ -72,10 +70,6 @@ function App() {
           <Route path="/" element={<LazyElement component={LandingPage} title="Loading Home..." />} />
           <Route path="/login" element={<LazyElement component={Login} title="Loading Login..." />} />
           <Route path="/signup" element={<LazyElement component={Signup} title="Loading Signup..." />} />
-          <Route
-            path="dashboard2"
-            element={<LazyElement component={Dashboard2} title="Loading Admin Dashboard..." />}
-          />
           {/* Protected Admin Routes */}
           <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
             <Route path="/admin" element={<AdminLayout />}>
@@ -142,10 +136,6 @@ function App() {
               <Route
                 path="dashboard"
                 element={<LazyElement component={Dashboard} title="Loading Dashboard..." />}
-              />
-              <Route
-                path="dashboard2"
-                element={<LazyElement component={Dashboard2} title="Loading Dashboard 2..." />}
               />
               <Route
                 path="students"
