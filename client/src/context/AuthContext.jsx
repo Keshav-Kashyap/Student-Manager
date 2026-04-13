@@ -19,6 +19,11 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(() => safeParseUser());
     const [loading, setLoading] = useState(true);
 
+    const syncUserFromStorage = () => {
+        setUser(safeParseUser());
+        setLoading(false);
+    };
+
     //  fetch user once
     const fetchUser = async () => {
         const cachedUser = safeParseUser();
@@ -53,6 +58,25 @@ export const AuthProvider = ({ children }) => {
     //  run once on app load
     useEffect(() => {
         fetchUser();
+
+        const handleUserDataChanged = (event) => {
+            setUser(event.detail ?? safeParseUser());
+            setLoading(false);
+        };
+
+        const handleStorageChange = (event) => {
+            if (event.key === USER_STORAGE_KEY) {
+                syncUserFromStorage();
+            }
+        };
+
+        window.addEventListener("userDataChanged", handleUserDataChanged);
+        window.addEventListener("storage", handleStorageChange);
+
+        return () => {
+            window.removeEventListener("userDataChanged", handleUserDataChanged);
+            window.removeEventListener("storage", handleStorageChange);
+        };
     }, []);
 
     //  login helper

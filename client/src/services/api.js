@@ -2,6 +2,10 @@
 import axios from 'axios';
 import { API_BASE } from '../config/api';
 
+const emitUserDataChanged = (userData) => {
+  window.dispatchEvent(new CustomEvent('userDataChanged', { detail: userData }));
+};
+
 // Create axios instance with cookie support
 const api = axios.create({
   baseURL: `${API_BASE}/api`,
@@ -64,6 +68,7 @@ export const authAPI = {
         if (response.data.user) {
           localStorage.setItem('user', JSON.stringify(response.data.user));
           localStorage.setItem('isAuthenticated', 'true');
+          emitUserDataChanged(response.data.user);
         }
 
         console.log(' Login successful, user data saved');
@@ -100,6 +105,7 @@ export const authAPI = {
         if (response.data.user) {
           localStorage.setItem('user', JSON.stringify(response.data.user));
           localStorage.setItem('isAuthenticated', 'true');
+          emitUserDataChanged(response.data.user);
         }
 
         console.log(' Registration successful');
@@ -125,6 +131,7 @@ export const authAPI = {
       // Clear client-side data
       localStorage.removeItem('user');
       localStorage.removeItem('isAuthenticated');
+      emitUserDataChanged(null);
       console.log('🚪 Client logout complete');
     }
   },
@@ -165,6 +172,7 @@ export const authAPI = {
         const userData = response.data.data || response.data.user;
         localStorage.setItem('user', JSON.stringify(userData));
         localStorage.setItem('isAuthenticated', 'true');
+        emitUserDataChanged(userData);
         return userData;
       }
       return null;
@@ -175,6 +183,7 @@ export const authAPI = {
       if (error.response?.status === 401) {
         localStorage.removeItem('user');
         localStorage.removeItem('isAuthenticated');
+        emitUserDataChanged(null);
       }
 
       throw error;

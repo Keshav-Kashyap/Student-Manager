@@ -8,12 +8,16 @@ const ProtectedRoute = ({ allowedRoles }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-       <SurajPrintingLoader/>
+        <SurajPrintingLoader />
       </div>
     );
   }
 
   if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!user.role) {
     return <Navigate to="/login" replace />;
   }
 
