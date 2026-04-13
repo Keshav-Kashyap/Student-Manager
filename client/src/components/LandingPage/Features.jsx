@@ -1,53 +1,84 @@
 import React from 'react';
-import { Users, Printer, BarChart3, Shield } from 'lucide-react';
+import { Users, Printer, BarChart3, Shield, Clock, Fingerprint } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const features = [
   {
     icon: Users,
     title: "Student Management",
-    description: "Easily manage student records, enrollment, and academic information in one place."
+    description: "Maintain complete student profiles, enrollment status, and academic records in one clean system."
   },
   {
     icon: Printer,
-    title: "ID Card Printing",
-    description: "Generate and print professional student ID cards with customizable templates."
+    title: "ID Card Workflows",
+    description: "Generate polished ID cards with approved templates and consistent institutional formatting."
   },
   {
     icon: BarChart3,
-    title: "Analytics Dashboard",
-    description: "Track student progress and institutional performance with detailed analytics."
+    title: "Performance Insights",
+    description: "Monitor trends in attendance, updates, and operations through easy-to-read metrics."
   },
   {
     icon: Shield,
-    title: "Secure & Reliable",
-    description: "Enterprise-grade security to protect sensitive student and institutional data."
+    title: "Security & Compliance",
+    description: "Protect sensitive student information with role-aware access and trusted security practices."
+  },
+  {
+    icon: Clock,
+    title: "Fast Daily Operations",
+    description: "Reduce administrative overhead with workflows tuned for repetitive day-to-day tasks."
+  },
+  {
+    icon: Fingerprint,
+    title: "Reliable Access Control",
+    description: "Keep every activity accountable with permission-aware controls across the platform."
   }
 ];
 
 const Features = () => {
   return (
-    <div className="text-center mb-16 max-w-7xl mx-auto px-6">
-      <h2 className="text-4xl font-bold text-white mb-4">Powerful Features</h2>
-      <p className="text-indigo-200 text-lg mb-12">Everything you need to manage your educational institution</p>
+    <motion.section
+      className="max-w-6xl mx-auto px-6 py-14 md:py-20"
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
+      <motion.div
+        className="text-center"
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={{ duration: 0.45, ease: 'easeOut' }}
+      >
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#2563eb]">Capabilities</p>
+        <h2 className="mt-4 text-3xl md:text-4xl font-bold tracking-tight text-[#171717]">Everything needed for modern administration</h2>
+        <p className="mt-4 text-[#52525b] text-base md:text-lg max-w-2xl mx-auto font-light">Built for institutions that care about accuracy, trust, and day-to-day operational clarity.</p>
+      </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {features.map((feature, index) => {
           const Icon = feature.icon;
+          const isBlueAccent = index % 2 === 0;
           return (
-            <div
+            <motion.div
               key={index}
-              className="group p-6 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105"
+              className="group p-7 bg-[#fbfaf7] rounded-2xl shadow-[0_1px_3px_rgba(16,24,40,0.06)] hover:shadow-[0_4px_14px_rgba(16,24,40,0.08)] transition-shadow duration-200 text-left"
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: 0.38, delay: index * 0.06, ease: 'easeOut' }}
             >
-              <div className="w-16 h-16 bg-gradient-to-br from-indigo-400 to-purple-600 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg group-hover:shadow-indigo-500/25">
-                <Icon size={28} className="text-white" />
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-5 ${isBlueAccent ? 'bg-[#e9f0ff]' : 'bg-[#f5ebdf]'}`}>
+                <Icon size={20} className={isBlueAccent ? 'text-[#2563eb]' : 'text-[#c67a2a]'} />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
-              <p className="text-indigo-200 leading-relaxed">{feature.description}</p>
-            </div>
+              <h3 className="text-lg font-semibold text-[#171717] tracking-tight">{feature.title}</h3>
+              <p className="mt-3 text-[#52525b] leading-relaxed text-sm md:text-base font-light">{feature.description}</p>
+            </motion.div>
           );
         })}
       </div>
-    </div>
+    </motion.section>
   );
 };
 

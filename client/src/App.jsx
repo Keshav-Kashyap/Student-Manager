@@ -1,13 +1,11 @@
 import React, { Suspense, lazy } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import FlashMessageProvider from "./components/common/FlashMessageProvider";
-import LazyFallback from "./components/common/LazyFallback";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import { ConfirmDialogProvider } from "./context/ConfirmDialogContext";
 import AdminLayout from "./Layouts/AdminLayout";
 import AuthenticatedLayout from "./Layouts/AuthenticatedLayout";
 import { UserManager } from "./Utils/UserManager";
-
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Login = lazy(() => import("./pages/Auth/Login"));
 const Signup = lazy(() => import("./pages/Auth/Signup"));
@@ -20,6 +18,7 @@ const ResetPassword = lazy(() => import("./pages/Auth/ResetPassword"));
 const EditProfile = lazy(() => import("./pages/EditProfile"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const StudentList = lazy(() => import("./pages/StudentList"));
+const Team = lazy(() => import("./pages/Team"));
 const AddStudentPage = lazy(() => import("./pages/AddStudentPage"));
 const EditStudentPage = lazy(() => import("./pages/EditStudentPage"));
 const ViewStudentIDCardPage = lazy(() => import("./pages/ViewStudent"));
@@ -31,6 +30,10 @@ const AdminViewStudent = lazy(() => import("./pages/AdminViewStudent"));
 const PageNotFound = lazy(() => import("./pages/page404"));
 const Chat = lazy(() => import("./pages/Chat"));
 
+const RouteShellFallback = () => (
+  <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50" />
+);
+
 // Helper component to check if user is logged in and route accordingly
 const ConditionalRoute = ({ component: Component, authPath }) => {
   const isLoggedIn = UserManager.getSavedUser();
@@ -40,14 +43,14 @@ const ConditionalRoute = ({ component: Component, authPath }) => {
   }
 
   return (
-    <Suspense fallback={<LazyFallback title="Loading Page..." />}>
+    <Suspense fallback={<RouteShellFallback />}>
       {React.createElement(Component)}
     </Suspense>
   );
 };
 
-const LazyElement = ({ component: Component, title }) => (
-  <Suspense fallback={<LazyFallback title={title} />}>
+const LazyElement = ({ component: Component }) => (
+  <Suspense fallback={<RouteShellFallback />}>
     {React.createElement(Component)}
   </Suspense>
 );
@@ -67,7 +70,6 @@ function App() {
           <Route path="/" element={<LazyElement component={LandingPage} title="Loading Home..." />} />
           <Route path="/login" element={<LazyElement component={Login} title="Loading Login..." />} />
           <Route path="/signup" element={<LazyElement component={Signup} title="Loading Signup..." />} />
-
           {/* Protected Admin Routes */}
           <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
             <Route path="/admin" element={<AdminLayout />}>
@@ -76,6 +78,7 @@ function App() {
                 path="dashboard"
                 element={<LazyElement component={Admindashboard} title="Loading Admin Dashboard..." />}
               />
+
               <Route
                 path="users"
                 element={<LazyElement component={UserManagement} title="Loading Users..." />}
@@ -139,6 +142,10 @@ function App() {
                 element={<LazyElement component={StudentList} title="Loading Students..." />}
               />
               <Route
+                path="team"
+                element={<LazyElement component={Team} title="Loading Team..." />}
+              />
+              <Route
                 path="students/add"
                 element={<LazyElement component={AddStudentPage} title="Loading Add Student..." />}
               />
@@ -154,6 +161,10 @@ function App() {
                 path="print"
                 element={<LazyElement component={PrintIDCard} title="Loading Print..." />}
               />
+              <Route
+                path="chat"
+                element={<LazyElement component={Chat} title="Loading Chat..." />}
+              />
               <Route path="help" element={<LazyElement component={Help} title="Loading Help..." />} />
               <Route path="about" element={<LazyElement component={About} title="Loading About..." />} />
               <Route
@@ -165,8 +176,11 @@ function App() {
 
           {/* Redirects */}
           <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
+          <Route path="/dashboard2" element={<Navigate to="/app/dashboard2" replace />} />
           <Route path="/students" element={<Navigate to="/app/students" replace />} />
+          <Route path="/team" element={<Navigate to="/app/team" replace />} />
           <Route path="/print" element={<Navigate to="/app/print" replace />} />
+          <Route path="/chat" element={<Navigate to="/app/chat" replace />} />
           <Route path="/add_new_student" element={<Navigate to="/app/students/add" replace />} />
           <Route path="/edit" element={<Navigate to="/app/edit" replace />} />
           <Route path="/app/create-profile" element={<Navigate to="/create-profile" replace />} />

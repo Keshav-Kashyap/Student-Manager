@@ -10,7 +10,7 @@ const StudentSelector = ({
   if (students.length === 0) return null;
 
   return (
-    <div className="print:hidden bg-white shadow-sm border-b border-gray-200 p-4">
+    <div className="print:hidden bg-white shadow-sm  rounded-b-lg border-b border-gray-200 p-4">
       <div className="max-w-7xl mx-auto">
         <div className="bg-gray-50 p-4 rounded-lg">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">

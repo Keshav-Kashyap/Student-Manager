@@ -1,6 +1,6 @@
 // components/Admin/AdminSidebar.jsx
 import React, { useState, useEffect } from "react";
-import { X, LayoutDashboard, Users, Settings, BarChart3, FileText, Shield } from "lucide-react";
+import { X, LayoutDashboard, Users, Layers, Settings, BarChart3, FileText, Shield } from "lucide-react";
 import AdminSidebarItem from "./AdminSidebarItem";
 import { API_BASE } from '../../config/api';
 
@@ -14,6 +14,12 @@ const AdminSidebar = ({ isOpen, onClose, className }) => {
       name: "Dashboard",
       href: "/dashboard",
       icon: LayoutDashboard,
+      badge: null
+    },
+    {
+      name: "Dashboard 2",
+      href: "/dashboard2",
+      icon: Layers,
       badge: null
     },
     {

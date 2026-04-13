@@ -1,116 +1,61 @@
-import React, { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import React, { useContext } from "react";
+import { Navigate, Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar/Navbar";
-import Sidebar from "../components/Sidebar";
 import MobileNavigation from "../components/MobileNavigation";
-import SurajPrintingLoader from "../components/common/loader";
 import { UserManager } from "../Utils/UserManager";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import AuthContext from "@/context/AuthContext";
 
 const AuthenticatedLayout = () => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
+    const { user, loading } = useContext(AuthContext);
 
-    useEffect(() => {
-        const loadUserData = () => {
-            try {
-                const savedUser = UserManager.getSavedUser();
-                if (savedUser) {
-                    setUser(savedUser);
-                } else {
-                    setUser(null);
-                    navigate("/login", { replace: true });
-                }
-            } catch (error) {
-                console.error("Error loading user data:", error);
-                UserManager.clearUser();
-                navigate("/login", { replace: true });
-            } finally {
-                setLoading(false);
-            }
-        };
+    if (!user) {
+        return <Navigate to="/login" replace />;
+    }
 
-        loadUserData();
-
-        const handleUserDataChange = (event) => {
-            const userData = event.detail;
-            if (userData) {
-                setUser(userData);
-            } else {
-                setUser(null);
-                navigate("/login", { replace: true });
-            }
-        };
-
-        const handleStorageChange = (e) => {
-            if (e.key === "user") {
-                loadUserData();
-            }
-        };
-
-        window.addEventListener("userDataChanged", handleUserDataChange);
-        window.addEventListener("storage", handleStorageChange);
-
-        return () => {
-            window.removeEventListener("userDataChanged", handleUserDataChange);
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, [navigate]);
-
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < 1024) {
-                setIsSidebarOpen(false);
-            }
-        };
-
-        if (typeof window !== "undefined") {
-            window.addEventListener("resize", handleResize);
-            return () => window.removeEventListener("resize", handleResize);
-        }
-
-        return undefined;
-    }, []);
 
     if (loading) {
-        return <SurajPrintingLoader title="Loading..." />;
+        return (
+            <div className="w-100 h-100 bg-black">
+
+                "Loading..."
+            </div>
+        )
     }
 
     return (
-        <div className="flex flex-col h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-            <Navbar user={user} />
+        <SidebarProvider
+            style={{
+                "--sidebar-width": "calc(var(--spacing) * 76)",
+                "--header-height": "4rem",
+            }}
+        >
+            <div className="flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-gray-50 to-blue-50">
+                <AppSidebar variant="inset" className="md:top-0 md:h-svh" />
 
-            <div className="flex flex-1 overflow-hidden pt-16">
-                {isSidebarOpen && (
-                    <div
-                        className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-                        onClick={() => setIsSidebarOpen(false)}
-                    />
-                )}
+                <SidebarInset className="min-w-0 bg-transparent md:m-0 md:rounded-none md:shadow-none">
+                    {/* <div className="sticky top-0 z-40 border-b border-white/50 bg-white/75 backdrop-blur">
+                        <Navbar user={user} embedded />
+                    </div> */}
 
-                <Sidebar
-                    isOpen={isSidebarOpen}
-                    onClose={() => setIsSidebarOpen(false)}
-                    className="h-[calc(100vh-64px)]"
-                    user={user}
-                />
+                    <div className="fixed right-4 top-20 z-40 hidden md:block">
+                        <SidebarTrigger className="h-10 w-10 rounded-full border border-white/70 bg-white/90 shadow-lg backdrop-blur hover:bg-white" />
+                    </div>
 
-                <main
-                    className={`flex-1 p-0 overflow-auto transition-all duration-300 ease-in-out ${isSidebarOpen ? "lg:ml-80" : "lg:ml-0"
-                        }`}
-                >
-                    <Outlet
-                        context={{
-                            user,
-                            setUser: UserManager.saveUser,
-                            clearUser: UserManager.clearUser,
-                        }}
-                    />
-                    <MobileNavigation />
-                </main>
+                    <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden pb-16 lg:pb-0">
+                        <Outlet
+                            context={{
+                                user,
+                                setUser: UserManager.saveUser,
+                                clearUser: UserManager.clearUser,
+                            }}
+                        />
+                        <MobileNavigation />
+                    </main>
+                </SidebarInset>
             </div>
-        </div>
+        </SidebarProvider>
     );
 };
 

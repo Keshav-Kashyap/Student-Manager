@@ -5,7 +5,6 @@ import StudentTable from '../components/StudentList/Student/StudentTable';
 
 import ErrorMessage from '../components/StudentList/ui/ErrorMessage';
 import useStudents from '../Hooks/useStudent';
-import SurajPrintingLoader from '../components/common/loader'
 
 import { useNavigate } from 'react-router-dom';
 import {
@@ -14,6 +13,7 @@ import {
   handleDeleteStudent,
   handleDeleteSelected
 } from '../handlers/studentHandlers';
+import StudentTableSkeleton from '@/components/StudentList/common/TableSkeleton';
 
 const StudentListPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,7 +26,11 @@ const StudentListPage = () => {
     error,
     fetchStudents,
     deleteStudent,
-    deleteMultipleStudents
+    deleteMultipleStudents,
+    currentPage,
+    totalPages,
+    totalStudents,
+    limit
   } = useStudents();
 
   const filteredStudents = students.filter(student =>
@@ -55,20 +59,18 @@ const StudentListPage = () => {
     navigate('/app/students/add');
   };
 
+  const handlePageChange = async (page) => {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+
+    await fetchStudents(page, limit);
+    setSelectedStudents([]);
+  };
+
   const handleExport = () => {
     console.log('Export functionality to be implemented');
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
 
-        <Header onAddNewStudent={handleAddNewStudent} />
-       <SurajPrintingLoader title="Loading Students..."  />
-
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -85,11 +87,11 @@ const StudentListPage = () => {
 
       <Header onAddNewStudent={handleAddNewStudent} />
 
-      <div className="max-w-7xl mb-[50px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="w-full overflow-x-auto px-4 py-6 sm:px-6 lg:px-8 xl:px-10 lg:py-8">
         <StudentSearch
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
-          onRefresh={fetchStudents}
+          onRefresh={() => fetchStudents(currentPage, limit)}
           onExport={handleExport}
           selectedCount={selectedStudents.length}
           onDeleteSelected={() =>
@@ -97,7 +99,7 @@ const StudentListPage = () => {
           }
         />
 
-        <StudentTable
+        {!loading ? <StudentTable
           students={filteredStudents}
           selectedStudents={selectedStudents}
           onSelectAll={handleSelectAll}
@@ -107,9 +109,13 @@ const StudentListPage = () => {
           onDelete={(id) =>
             handleDeleteStudent(id, deleteStudent, setSelectedStudents)
           }
-          totalStudents={students.length}
-        />
-      </div>
+          totalStudents={totalStudents}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          limit={limit}
+        /> : <StudentTableSkeleton />}
+      </main>
     </div>
   );
 };

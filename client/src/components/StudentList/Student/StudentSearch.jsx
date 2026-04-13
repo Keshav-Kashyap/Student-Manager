@@ -1,19 +1,19 @@
 import React from 'react';
 import { Search, Filter, Download, Trash2 } from 'lucide-react';
 
-const StudentSearch = ({ 
-  searchTerm, 
-  onSearchChange, 
-  onRefresh, 
-  onExport, 
-  selectedCount, 
-  onDeleteSelected 
+const StudentSearch = ({
+  searchTerm,
+  onSearchChange,
+  onRefresh,
+  onExport,
+  selectedCount,
+  onDeleteSelected
 }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div className="bg-white shadow-sm border border-gray-100 p-4 sm:p-6 rounded-2xl mb-6 sm:mb-8">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         {/* Search */}
-        <div className="relative flex-1 max-w-md">
+        <div className="relative w-full lg:max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
@@ -25,21 +25,21 @@ const StudentSearch = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-3">
-          <button 
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-start">
+          <button
             onClick={onRefresh}
-            className="flex items-center gap-2 px-4 py-3 text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-50 px-4 py-3 text-gray-700 transition-colors duration-200 hover:bg-gray-100"
           >
             <Filter size={18} />
             Refresh
           </button>
-         
-    
-      
+
+
+
           {selectedCount > 0 && (
-            <button 
+            <button
               onClick={onDeleteSelected}
-              className="flex items-center gap-2 px-4 py-3 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-colors duration-200"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-50 px-4 py-3 text-red-600 transition-colors duration-200 hover:bg-red-100"
             >
               <Trash2 size={18} />
               Delete ({selectedCount})
