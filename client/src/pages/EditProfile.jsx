@@ -437,7 +437,7 @@ const EditProfile = ({ isCreateMode: propIsCreateMode }) => {
 
   if (!isCreateMode && profileLoading) {
     return (
-      <ProfileSkeleton/>
+      <ProfileSkeleton />
     );
   }
 
