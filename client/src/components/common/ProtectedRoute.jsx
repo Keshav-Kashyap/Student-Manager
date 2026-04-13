@@ -4,6 +4,8 @@ import SurajPrintingLoader from "./loader";
 
 const ProtectedRoute = ({ allowedRoles }) => {
   const { user, loading } = useAuth();
+  const role = user?.role || null;
+  const isAppRoute = allowedRoles?.includes("teacher");
 
   if (loading) {
     return (
@@ -17,12 +19,20 @@ const ProtectedRoute = ({ allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (!user.role) {
+  if (!role && !isAppRoute) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!allowedRoles.includes(user.role)) {
-    return user.role === "admin"
+  if (isAppRoute) {
+    if (role === "admin") {
+      return <Navigate to="/admin/dashboard" replace />;
+    }
+
+    return <Outlet />;
+  }
+
+  if (!allowedRoles.includes(role)) {
+    return role === "admin"
       ? <Navigate to="/admin/dashboard" replace />
       : <Navigate to="/app/dashboard" replace />;
   }
