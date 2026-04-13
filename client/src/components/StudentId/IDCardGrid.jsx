@@ -19,7 +19,7 @@ const IDCardGrid = ({ students, deleteStudent, setSelectedStudents, printSetting
   const getGridClass = () => {
     switch (printSettings.layout) {
       case '2x2':
-        return 'grid-cols-1 sm:grid-cols-2 print:grid-cols-2';
+        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 print:grid-cols-2';
       case '3x2':
         return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 print:grid-cols-3';
       case '4x2':
@@ -33,7 +33,7 @@ const IDCardGrid = ({ students, deleteStudent, setSelectedStudents, printSetting
     <>
       <div className={`grid gap-4 sm:gap-6 ${getGridClass()} print:gap-4 justify-items-center`}>
         {students.map((student) => (
-          <div key={student._id} className="break-inside-avoid w-full max-w-lg">
+          <div key={student._id} className="break-inside-avoid w-full ">
             <IDCard
               student={student}
               onView={onView}

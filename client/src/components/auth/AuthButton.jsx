@@ -7,7 +7,7 @@ const AuthButton = ({ loading, loadingText, children, type = 'submit', disabled 
       type={type}
       disabled={loading || disabled}
       onClick={onClick}
-      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-4 px-4 rounded-xl hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent transform hover:scale-105 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+      className="w-full bg-[#1d4ed8] text-white font-semibold py-3 px-4 rounded-xl hover:bg-[#1e40af] focus:outline-none focus:ring-2 focus:ring-[#93c5fd] focus:ring-offset-2 focus:ring-offset-white transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed shadow-[0_4px_14px_rgba(37,99,235,0.25)]"
     >
       {loading ? (
         <div className="flex items-center justify-center">

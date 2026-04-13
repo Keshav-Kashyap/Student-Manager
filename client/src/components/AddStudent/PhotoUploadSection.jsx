@@ -41,19 +41,19 @@ const PhotoUploadSection = ({ photoPreview, handlePhotoChange, removePhoto }) =>
       const img = imageRef.current;
       const containerWidth = 400;
       const containerHeight = 300;
-      
+
       const scaleX = containerWidth / img.naturalWidth;
       const scaleY = containerHeight / img.naturalHeight;
       const scale = Math.min(scaleX, scaleY);
-      
+
       const displayWidth = img.naturalWidth * scale;
       const displayHeight = img.naturalHeight * scale;
-      
+
       setImageSize({ width: displayWidth, height: displayHeight });
-      
+
       const cropWidth = Math.min(150, displayWidth - 20);
       const cropHeight = Math.min(180, displayHeight - 20);
-      
+
       setCropData({
         x: (displayWidth - cropWidth) / 2,
         y: (displayHeight - cropHeight) / 2,
@@ -90,10 +90,10 @@ const PhotoUploadSection = ({ photoPreview, handlePhotoChange, removePhoto }) =>
       const rect = e.currentTarget.getBoundingClientRect();
       const newX = e.clientX - rect.left - dragStart.x;
       const newY = e.clientY - rect.top - dragStart.y;
-      
+
       const maxX = imageSize.width - cropData.width;
       const maxY = imageSize.height - cropData.height;
-      
+
       setCropData(prev => ({
         ...prev,
         x: Math.max(0, Math.min(newX, maxX)),
@@ -103,16 +103,16 @@ const PhotoUploadSection = ({ photoPreview, handlePhotoChange, removePhoto }) =>
       const rect = e.currentTarget.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
-      
+
       const imageLeft = (400 - imageSize.width) / 2;
       const imageTop = (300 - imageSize.height) / 2;
-      
+
       const relativeX = mouseX - imageLeft;
       const relativeY = mouseY - imageTop;
-      
+
       setCropData(prev => {
         let newCrop = { ...prev };
-        
+
         switch (resizeHandle) {
           case 'se': // bottom-right
             newCrop.width = Math.max(50, Math.min(relativeX - prev.x, imageSize.width - prev.x));
@@ -143,7 +143,7 @@ const PhotoUploadSection = ({ photoPreview, handlePhotoChange, removePhoto }) =>
             newCrop.y = newYNW;
             break;
         }
-        
+
         return newCrop;
       });
     }
@@ -157,17 +157,17 @@ const PhotoUploadSection = ({ photoPreview, handlePhotoChange, removePhoto }) =>
 
   const applyCrop = useCallback(() => {
     if (!originalImage || !imageRef.current) return;
-    
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const img = imageRef.current;
-    
+
     const scaleX = img.naturalWidth / imageSize.width;
     const scaleY = img.naturalHeight / imageSize.height;
-    
+
     canvas.width = cropData.width;
     canvas.height = cropData.height;
-    
+
     ctx.drawImage(
       img,
       cropData.x * scaleX,
@@ -179,16 +179,16 @@ const PhotoUploadSection = ({ photoPreview, handlePhotoChange, removePhoto }) =>
       cropData.width,
       cropData.height
     );
-    
+
     canvas.toBlob((blob) => {
       const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
-      
+
       const fakeEvent = {
         target: {
           files: [blob]
         }
       };
-      
+
       handlePhotoChange(fakeEvent, croppedDataUrl);
       setShowCropper(false);
       setOriginalImage(null);
@@ -203,7 +203,7 @@ const PhotoUploadSection = ({ photoPreview, handlePhotoChange, removePhoto }) =>
   const resetCrop = useCallback(() => {
     const cropWidth = Math.min(150, imageSize.width - 20);
     const cropHeight = Math.min(180, imageSize.height - 20);
-    
+
     setCropData({
       x: (imageSize.width - cropWidth) / 2,
       y: (imageSize.height - cropHeight) / 2,
@@ -232,7 +232,7 @@ const PhotoUploadSection = ({ photoPreview, handlePhotoChange, removePhoto }) =>
             </div>
 
             <div className="mb-4">
-              <div 
+              <div
                 className="relative mx-auto border border-gray-300 rounded-lg overflow-hidden bg-gray-100"
                 style={{ width: '400px', height: '300px' }}
                 onMouseMove={handleMouseMove}
@@ -250,16 +250,16 @@ const PhotoUploadSection = ({ photoPreview, handlePhotoChange, removePhoto }) =>
                     height: imageSize.height
                   }}
                 />
-                
+
                 {/* Dark overlay behind the crop area */}
                 <div className="absolute inset-0 bg-black opacity-0 pointer-events-none" s />
-                
+
                 {/* Crop area with transparent background */}
                 <div
                   className="absolute border-2 border-blue-400 cursor-move"
                   style={{
-                    left: `calc(50% - ${imageSize.width/2}px + ${cropData.x}px)`,
-                    top: `calc(50% - ${imageSize.height/2}px + ${cropData.y}px)`,
+                    left: `calc(50% - ${imageSize.width / 2}px + ${cropData.x}px)`,
+                    top: `calc(50% - ${imageSize.height / 2}px + ${cropData.y}px)`,
                     width: cropData.width,
                     height: cropData.height,
                     backgroundColor: 'transparent',
@@ -268,23 +268,23 @@ const PhotoUploadSection = ({ photoPreview, handlePhotoChange, removePhoto }) =>
                   onMouseDown={handleMouseDown}
                 >
                   {/* Resize handles */}
-                  <div 
+                  <div
                     className="absolute -top-2 -left-2 w-4 h-4 bg-blue-500 border-2 border-white rounded-full cursor-nw-resize shadow-md"
                     onMouseDown={(e) => handleResizeStart(e, 'nw')}
                   ></div>
-                  <div 
+                  <div
                     className="absolute -top-2 -right-2 w-4 h-4 bg-blue-500 border-2 border-white rounded-full cursor-ne-resize shadow-md"
                     onMouseDown={(e) => handleResizeStart(e, 'ne')}
                   ></div>
-                  <div 
+                  <div
                     className="absolute -bottom-2 -left-2 w-4 h-4 bg-blue-500 border-2 border-white rounded-full cursor-sw-resize shadow-md"
                     onMouseDown={(e) => handleResizeStart(e, 'sw')}
                   ></div>
-                  <div 
+                  <div
                     className="absolute -bottom-2 -right-2 w-4 h-4 bg-blue-500 border-2 border-white rounded-full cursor-se-resize shadow-md"
                     onMouseDown={(e) => handleResizeStart(e, 'se')}
                   ></div>
-                  
+
                   {/* Center indicator */}
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-blue-400 rounded-full pointer-events-none"></div>
                 </div>
@@ -299,7 +299,7 @@ const PhotoUploadSection = ({ photoPreview, handlePhotoChange, removePhoto }) =>
                 <RotateCcw size={16} />
                 Reset
               </button>
-              
+
               <div className="flex gap-3">
                 <button
                   onClick={cancelCrop}
@@ -358,12 +358,12 @@ const PhotoUploadSection = ({ photoPreview, handlePhotoChange, removePhoto }) =>
             </label>
 
             <div className="space-y-2">
-              <input 
-                id="photo-upload" 
-                type="file" 
-                accept="image/*" 
-                onChange={handleFileSelect} 
-                className="hidden" 
+              <input
+                id="photo-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
               />
               <label
                 htmlFor="photo-upload"
@@ -373,7 +373,7 @@ const PhotoUploadSection = ({ photoPreview, handlePhotoChange, removePhoto }) =>
                 Choose Photo
               </label>
               <p className="text-xs text-gray-500">Supported formats: JPG, PNG, GIF (Max 5MB)</p>
-              <p className="text-xs text-blue-600">✨ After upload, you can crop your photo to the perfect size!</p>
+              <p className="text-xs text-blue-600"> After upload, you can crop your photo to the perfect size!</p>
             </div>
           </div>
         </div>

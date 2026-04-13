@@ -299,7 +299,7 @@ export const studentAPI = {
 
   delete: async (id) => {
     try {
-      console.log('🗑️ Deleting student:', id);
+      console.log(' Deleting student:', id);
       const response = await api.delete(`/students/${id}`);
       console.log(' Student deleted:', response.data);
       return response.data;

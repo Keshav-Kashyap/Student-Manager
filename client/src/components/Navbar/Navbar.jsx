@@ -4,7 +4,7 @@ import DesktopMenu from "./DesktopMenu";
 import MobileMenu from "./MobileMenu";
 import UserAvatar from "./UserAvatar";
 
-const Navbar = ({ user }) => {
+const Navbar = ({ user, embedded = false }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleMobileMenuToggle = () => {
@@ -15,14 +15,28 @@ const Navbar = ({ user }) => {
     setIsMobileMenuOpen(false);
   };
 
+  const navClassName = embedded
+    ? "bg-gradient-to-r from-white/95 via-blue-50/90 to-purple-50/95 backdrop-blur-lg"
+    : "bg-gradient-to-r from-white/95 via-blue-50/90 to-purple-50/95 backdrop-blur-lg shadow-xl border-b border-white/20 fixed top-0 left-0 right-0 z-50";
+
+  const containerClassName = embedded
+    ? "w-full px-4 lg:px-6"
+    : "max-w-7xl mx-auto px-6 lg:px-10";
+
+  const innerClassName = embedded
+    ? "flex justify-end items-center h-16"
+    : "flex justify-between items-center h-16";
+
   return (
-    <nav className="bg-gradient-to-r from-white/95 via-blue-50/90 to-purple-50/95 backdrop-blur-lg shadow-xl border-b border-white/20 fixed top-0 left-0 right-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <div className="flex justify-between items-center h-16">
+    <nav className={navClassName}>
+      <div className={containerClassName}>
+        <div className={innerClassName}>
           {/* Left Side - Logo */}
-          <div className="flex items-center space-x-4">
-            <Logo user={user} />
-          </div>
+          {!embedded && (
+            <div className="flex items-center space-x-4">
+              <Logo user={user} />
+            </div>
+          )}
 
           {/* Desktop Menu */}
           <DesktopMenu user={user} />
@@ -43,7 +57,7 @@ const Navbar = ({ user }) => {
       </div>
 
       {/* Mobile Menu */}
-      <MobileMenu 
+      <MobileMenu
         isOpen={isMobileMenuOpen}
         onClose={closeMobileMenu}
         user={user}

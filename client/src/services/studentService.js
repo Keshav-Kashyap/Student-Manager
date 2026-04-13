@@ -38,7 +38,7 @@ const handleResponse = async (response) => {
   return result.data || result; // Handle both formats
 };
 
-// 🔥 FIXED: Get common headers with proper authentication
+//  FIXED: Get common headers with proper authentication
 const getHeaders = (isFormData = false) => {
   const headers = {};
 
@@ -116,19 +116,29 @@ export const isAuthenticated = () => {
   return isAuth;
 };
 
-// 🔥 FIXED: Student API functions with proper authentication
+//  FIXED: Student API functions with proper authentication
 
 // Fetch all students for the authenticated user
-export const fetchStudents = async () => {
+export const fetchStudents = async (page = 1, limit = 10) => {
   try {
-    console.log('📡 Fetching students...');
-    const response = await fetch(`${API_BASE2}`, {
+
+    const response = await fetch(`${API_BASE2}?page=${page}&limit=${limit}`, {
       method: 'GET',
       headers: getHeaders(),
       credentials: 'include'
     });
 
-    const result = await handleResponse(response);
+    // Keep full payload for paginated list responses (count, totalCount, currentPage, totalPages, limit, data).
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.message || 'Operation failed');
+    }
+
     console.log(' Students fetched:', result);
     return result;
   } catch (error) {
@@ -140,7 +150,7 @@ export const fetchStudents = async () => {
 // Delete a single student
 export const deleteStudent = async (studentId) => {
   try {
-    console.log('🗑️ Deleting student:', studentId);
+    console.log(' Deleting student:', studentId);
     const response = await fetch(`${API_BASE2}/${studentId}`, {
       method: 'DELETE',
       credentials: 'include',
@@ -159,7 +169,7 @@ export const deleteStudent = async (studentId) => {
 // Delete multiple students
 export const deleteMultipleStudents = async (studentIds) => {
   try {
-    console.log('🗑️ Batch deleting students:', studentIds);
+    console.log(' Batch deleting students:', studentIds);
     const response = await fetch(`${API_BASE2}`, {
       method: 'DELETE',
       headers: getHeaders(),
@@ -195,7 +205,7 @@ export const getStudentById = async (studentId) => {
   }
 };
 
-// 🔥 FIXED: Create new student with proper FormData handling
+//  FIXED: Create new student with proper FormData handling
 export const createStudent = async (studentData) => {
   try {
     console.log('➕ Creating student:', studentData);
@@ -241,7 +251,7 @@ export const createStudent = async (studentData) => {
   }
 };
 
-// 🔥 FIXED: Update student with proper FormData handling
+//  FIXED: Update student with proper FormData handling
 export const updateStudent = async (studentId, studentData) => {
   try {
     console.log('✏️ Updating student:', studentId, studentData);

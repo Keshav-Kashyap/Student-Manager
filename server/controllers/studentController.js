@@ -52,15 +52,50 @@ const getAllStudents = async (req, res) => {
     const userId = getUserId(req);
     if (!userId) return res.status(401).json({ success: false, message: 'User identification required.' });
 
-    const students = await Student.find({ createdBy: userId }).populate('createdBy', 'name email').sort({ createdAt: -1 });
+    const { page = 1, limit } = req.query;
 
-    const totalCount = await Student.countDocuments();
-    console.log("total Students", totalCount);
+    if (typeof limit === 'undefined') {
+      return res.status(400).json({
+        success: false,
+        message: 'Query parameter "limit" is required.'
+      });
+    }
+
+    const parsedPage = Number.parseInt(page, 10);
+    const parsedLimit = Number.parseInt(limit, 10);
+
+    if (!Number.isInteger(parsedPage) || parsedPage < 1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Query parameter "page" must be a positive integer.'
+      });
+    }
+
+    if (!Number.isInteger(parsedLimit) || parsedLimit < 1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Query parameter "limit" must be a positive integer.'
+      });
+    }
+
+    const skip = (parsedPage - 1) * parsedLimit;
+
+    const students = await Student.find({ createdBy: userId })
+      .populate('createdBy', 'name email')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parsedLimit);
+
+    const totalCount = await Student.countDocuments({ createdBy: userId });
+    const totalPages = Math.ceil(totalCount / parsedLimit);
 
     res.status(200).json({
       success: true,
       count: students.length,
       totalCount,
+      currentPage: parsedPage,
+      totalPages,
+      limit: parsedLimit,
       data: students,
       message: students.length === 0 ? 'No students found for this user' : 'Students retrieved successfully'
     });

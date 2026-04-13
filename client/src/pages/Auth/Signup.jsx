@@ -125,7 +125,7 @@ const Signup = () => {
       <AuthHeader 
         title="Create Account"
         subtitle="Join our community of educators"
-        icon={<UserPlus className="w-10 h-10 text-white" />}
+        icon={<UserPlus className="w-9 h-9 text-[#1d4ed8]" />}
       />
 
       <SocialAuth 
@@ -134,7 +134,7 @@ const Signup = () => {
 
       <ErrorMessage message={error} />
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <InputField
           label="Full Name"
           name="name"
@@ -158,29 +158,31 @@ const Signup = () => {
           icon={<Mail className="w-5 h-5" />}
         />
 
-        <InputField
-          label="Password"
-          type="password"
-          name="password"
-          placeholder="Create a password (min 6 characters)"
-          value={formData.password}
-          onChange={handleChange}
-          required
-          disabled={loading}
-          icon={<Lock className="w-5 h-5" />}
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <InputField
+            label="Password"
+            type="password"
+            name="password"
+            placeholder="Create password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            disabled={loading}
+            icon={<Lock className="w-5 h-5" />}
+          />
 
-        <InputField
-          label="Confirm Password"
-          type="password"
-          name="confirmPassword"
-          placeholder="Confirm your password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          required
-          disabled={loading}
-          icon={<Check className="w-5 h-5" />}
-        />
+          <InputField
+            label="Confirm Password"
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+            disabled={loading}
+            icon={<Check className="w-5 h-5" />}
+          />
+        </div>
 
         <AuthButton 
           loading={loading}
@@ -191,12 +193,12 @@ const Signup = () => {
       </form>
 
       {/* Footer */}
-      <div className="mt-8 text-center">
-        <p className="text-gray-300">
+      <div className="mt-5 text-center">
+        <p className="text-[#71717a] text-sm">
           Already have an account?{' '}
           <Link 
             to="/login" 
-            className="text-blue-400 hover:text-purple-400 font-semibold transition duration-200"
+            className="text-[#c67a2a] hover:text-[#9a6020] font-semibold transition duration-200"
           >
             Sign In
           </Link>

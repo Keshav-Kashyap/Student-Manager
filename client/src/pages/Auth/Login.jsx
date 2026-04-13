@@ -5,7 +5,7 @@ import { authAPI } from '../../services/api';
 import { API_BASE } from "../../config/api";
 import toast from 'react-hot-toast';
 import { TokenVerificationService } from '../../Utils/tokenVerification';
-import { User, Mail, Lock, LogIn } from "lucide-react";
+import { Mail, Lock, LogIn } from "lucide-react";
 // Import reusable components
 import AuthLayout from '../../components/auth/AuthLayout';
 import AuthHeader from '../../components/auth/AuthHeader';
@@ -134,7 +134,7 @@ const Login = () => {
       <AuthHeader
         title="Welcome Back!"
         subtitle="Sign in to manage your students"
-        icon={<LogIn className="w-10 h-10 text-white" />}
+        icon={<LogIn className="w-9 h-9 text-[#1d4ed8]" />}
       />
 
       <SocialAuth
@@ -143,7 +143,7 @@ const Login = () => {
 
       <ErrorMessage message={error} />
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <InputField
           label="Email Address"
           type="email"
@@ -177,22 +177,22 @@ const Login = () => {
       </form>
 
       {/* Forgot Password Link */}
-      <div className="mt-6 text-center">
+      <div className="mt-4 text-center">
         <Link
           to="/forgot-password"
-          className="text-blue-400 hover:text-purple-400 text-sm transition duration-200"
+          className="text-[#2563eb] hover:text-[#1e40af] text-sm transition duration-200"
         >
           Forgot your password?
         </Link>
       </div>
 
       {/* Footer */}
-      <div className="mt-8 text-center">
-        <p className="text-gray-300">
+      <div className="mt-5 text-center">
+        <p className="text-[#71717a] text-sm">
           Don't have an account?{' '}
           <Link
             to="/signup"
-            className="text-blue-400 hover:text-purple-400 font-semibold transition duration-200"
+            className="text-[#c67a2a] hover:text-[#9a6020] font-semibold transition duration-200"
           >
             Create Account
           </Link>

@@ -5,15 +5,15 @@ const PrintHeader = ({
   studentsToPrint,
   selectedStudents,
   loading,
-   printing,
+  printing,
   onRefresh,
   onPrint,
   onExportPDF
 }) => {
-  
+
   return (
-    <div className="print:hidden bg-white shadow-sm border-b border-gray-200 p-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="print:hidden bg-white rounded-t-lg shadow-sm border-b border-gray-200 p-4">
+      <div className="w-full px-0 sm:px-2 lg:px-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
@@ -44,22 +44,22 @@ const PrintHeader = ({
             </button>
 
             <button
-  onClick={onPrint}
-  className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
-  disabled={printing || studentsToPrint.length === 0}
->
-  {printing ? (
-    <>
-      <RefreshCw size={18} className="animate-spin" />
-      Sending to Print...
-    </>
-  ) : (
-    <>
-      <Printer size={18} />
-      Send to Print ({studentsToPrint.length})
-    </>
-  )}
-</button>
+              onClick={onPrint}
+              className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
+              disabled={printing || studentsToPrint.length === 0}
+            >
+              {printing ? (
+                <>
+                  <RefreshCw size={18} className="animate-spin" />
+                  Sending to Print...
+                </>
+              ) : (
+                <>
+                  <Printer size={18} />
+                  Send to Print ({studentsToPrint.length})
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>

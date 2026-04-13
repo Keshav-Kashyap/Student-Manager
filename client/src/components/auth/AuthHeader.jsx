@@ -2,14 +2,14 @@ import React from 'react';
 
 const AuthHeader = ({ title, subtitle, icon }) => {
   return (
-    <div className="text-center mb-8">
-      <div className="mx-auto w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg transform hover:scale-105 transition-transform duration-200">
+    <div className="text-center mb-5">
+      <div className="mx-auto w-16 h-16 bg-[#eef3ff] rounded-2xl flex items-center justify-center mb-4 border border-[#dbe8ff]">
         {icon}
       </div>
-      <h2 className="text-4xl font-bold text-white mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+      <h2 className="text-3xl md:text-[34px] font-bold text-[#171717] tracking-tight mb-1.5 leading-tight">
         {title}
       </h2>
-      <p className="text-gray-300 text-lg">{subtitle}</p>
+      <p className="text-[#71717a] text-sm md:text-[15px]">{subtitle}</p>
     </div>
   );
 };
